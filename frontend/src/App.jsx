@@ -1,81 +1,131 @@
+// frontend/src/App.jsx - COMPLETE VERSION
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { useAuth, AuthProvider } from './contexts/AuthContext'
 import { supabase } from './utils/supabaseClient'
+
+// Public Screens
+import LandingScreen from './screens/LandingScreen'
+import FeaturesScreen from './screens/FeaturesScreen'
+import InvestorScreen from './screens/InvestorScreen'
+
+// Auth Screens
 import RegisterScreen from './screens/RegisterScreen'
 import LoginScreen from './screens/LoginScreen'
-import MorningFaceCapture from './components/MorningFaceCapture'
-import { useState, useEffect } from 'react'
 
-function HomeScreen() {
-  const [streak, setStreak] = useState(0)
-  const [userName, setUserName] = useState('')
+// Onboarding Screens
+import OnboardingScreen from './screens/OnboardingScreen'
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = (await supabase.auth.getSession()).data.session?.access_token
-      const response = await fetch('http://localhost:8000/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      const data = await response.json()
-      if (data.success) {
-        setStreak(data.profile.streak_days || 0)
-        setUserName(data.profile.name || data.profile.email?.split('@')[0] || 'Friend')
-      }
-    }
-    fetchProfile()
-  }, [])
+// App Screens (Authenticated)
+import HomeScreen from './screens/HomeScreen'
+import DiscoverScreen from './screens/DiscoverScreen'
+import MatchesScreen from './screens/MatchesScreen'
+import ProfileScreen from './screens/ProfileScreen'
+import SisterhoodScreen from './screens/SisterhoodScreen'
 
-  const handleUploadComplete = (newStreak) => {
-    setStreak(newStreak)
-  }
-
-  return (
-    <div className="min-h-screen bg-badfriends-bg p-4">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-white mb-2">🍜 Bad Friends</h1>
-          <p className="text-gray-400">Morning faces. Bad jokes. Real matches.</p>
-          {streak > 0 && (
-            <div className="inline-block mt-2 px-3 py-1 bg-cheeto/20 border border-cheeto rounded-full">
-              <span className="text-cheeto text-sm font-semibold">🔥 {streak} day streak</span>
-            </div>
-          )}
-        </div>
-        
-        <MorningFaceCapture 
-          onUploadComplete={handleUploadComplete}
-          currentStreak={streak}
-        />
-        
-        <div className="mt-6 text-center">
-          <button 
-            onClick={() => supabase.auth.signOut()}
-            className="text-gray-500 text-sm hover:text-gray-400 transition"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+// Loading Component
+const LoadingScreen = () => (
+  <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cheeto mx-auto mb-4"></div>
+      <p className="text-gray-400">Loading Bad Friends...</p>
     </div>
-  )
-}
+  </div>
+)
 
 function AppContent() {
   const { user, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-badfriends-bg flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    )
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true)
+  const [userGender, setUserGender] = useState(null)
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!user) {
+        setCheckingOnboarding(false)
+        return
+      }
+      
+      try {
+        const token = (await supabase.auth.getSession()).data.session?.access_token
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const data = await response.json()
+        
+        if (data.success && data.profile) {
+          // Check if psychological profile exists
+          const hasPsychProfile = data.profile.psychological_profile_complete || false
+          setHasCompletedOnboarding(hasPsychProfile)
+          setUserGender(data.profile.gender)
+        }
+      } catch (error) {
+        console.error('Error checking onboarding:', error)
+      } finally {
+        setCheckingOnboarding(false)
+      }
+    }
+    
+    checkOnboardingStatus()
+  }, [user])
+  
+  if (loading || checkingOnboarding) {
+    return <LoadingScreen />
   }
-
+  
   return (
     <Routes>
-      <Route path="/register" element={!user ? <RegisterScreen /> : <Navigate to="/" />} />
-      <Route path="/login" element={!user ? <LoginScreen /> : <Navigate to="/" />} />
-      <Route path="/" element={user ? <HomeScreen /> : <Navigate to="/login" />} />
+      {/* Public Routes - No Login Required */}
+      <Route path="/" element={<LandingScreen />} />
+      <Route path="/features" element={<FeaturesScreen />} />
+      <Route path="/investors" element={<InvestorScreen />} />
+      
+      {/* Auth Routes - Redirect to app if already logged in */}
+      <Route path="/register" element={!user ? <RegisterScreen /> : <Navigate to="/onboarding" />} />
+      <Route path="/login" element={!user ? <LoginScreen /> : <Navigate to="/onboarding" />} />
+      
+      {/* Onboarding Route - Required after login */}
+      <Route 
+        path="/onboarding" 
+        element={user ? <OnboardingScreen /> : <Navigate to="/login" />} 
+      />
+      
+      {/* App Routes - Authenticated + Onboarding Complete */}
+      <Route 
+        path="/app" 
+        element={user && hasCompletedOnboarding ? <HomeScreen /> : <Navigate to="/onboarding" />} 
+      />
+      <Route 
+        path="/app/feed" 
+        element={user && hasCompletedOnboarding ? <HomeScreen /> : <Navigate to="/onboarding" />} 
+      />
+      <Route 
+        path="/app/discover" 
+        element={user && hasCompletedOnboarding ? <DiscoverScreen /> : <Navigate to="/onboarding" />} 
+      />
+      <Route 
+        path="/app/matches" 
+        element={user && hasCompletedOnboarding ? <MatchesScreen /> : <Navigate to="/onboarding" />} 
+      />
+      <Route 
+        path="/app/profile" 
+        element={user && hasCompletedOnboarding ? <ProfileScreen /> : <Navigate to="/onboarding" />} 
+      />
+      
+      {/* Sisterhood Route - Women Only */}
+      <Route 
+        path="/app/sisterhood" 
+        element={
+          user && hasCompletedOnboarding && userGender === 'woman' 
+            ? <SisterhoodScreen /> 
+            : <Navigate to="/app" />
+        } 
+      />
+      
+      {/* Catch all - redirect to home */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
 }

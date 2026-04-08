@@ -137,6 +137,41 @@ async def get_answer_feed(limit: int = 20, current_user: dict = Depends(get_curr
     result = supabase.table("answers").select("*, users!inner(name)").eq("question_id", question_result.data[0]["id"]).in_("user_id", friend_ids).order("created_at", desc=True).limit(limit).execute()
     return {"success": True, "answers": result.data}
 
+# =====================================================
+# NEW ENDPOINT: Baseline questions for onboarding
+# =====================================================
+
+@app.get("/questions/baseline")
+async def get_baseline_questions():
+    """Get baseline questions for onboarding CMI"""
+    result = supabase.table("daily_questions").select("id, question_text").execute()
+    
+    if result.data and len(result.data) >= 5:
+        return {
+            "success": True,
+            "questions": [{"id": q["id"], "text": q["question_text"]} for q in result.data[:10]]
+        }
+    
+    # Fallback - only used if database has no questions
+    fallback = [
+        {"id": "1", "text": "Would you suck Jamie Lee Curtis's big toe for a Klondike bar?"},
+        {"id": "2", "text": "Would you rather fight one Bobby-Lee-sized ant or 100 ant-sized Bobby Lees?"},
+        {"id": "3", "text": "Rate your current tiredness as a weather forecast."},
+        {"id": "4", "text": "What's something you're NOT going to feel guilty about today?"},
+        {"id": "5", "text": "How many ant traps belong on a fridge?"},
+        {"id": "6", "text": "Are you a Fancy B or a Rudy in a group project?"},
+        {"id": "7", "text": "What's the most overrated thing about breakfast tacos?"},
+        {"id": "8", "text": "If your morning face was a movie title, what would it be?"},
+        {"id": "9", "text": "What's your Bobo energy level today?"},
+        {"id": "10", "text": "Would you let an ant keep the cracker or make it start over?"}
+    ]
+    
+    return {"success": True, "questions": fallback}
+
+# =====================================================
+# EXISTING ENDPOINTS (unchanged)
+# =====================================================
+
 @app.post("/reactions")
 async def add_reaction(target_type: str = Form(...), target_id: str = Form(...), reaction_type: str = Form(...), current_user: dict = Depends(get_current_user)):
     existing = supabase.table("reactions").select("*").eq("user_id", current_user["id"]).eq("target_type", target_type).eq("target_id", target_id).execute()
