@@ -1,4 +1,468 @@
 ARCHITECTURE.md
+
+ ARCHITECTURE.md - FINAL v1.0
+## Bad Friends Morning Face Build
+### Last Updated: April 8, 2026
+
+## TABLE OF CONTENTS
+
+1. Core Differentiators (Protected)
+2. Complete v1 Feature Set
+3. Enhanced Onboarding Flow
+4. AI Question Generation System
+5. Four Friendship Layers
+6. Single Feed Architecture
+7. Discovery & Matching Engine
+8. Safety Architecture (Sisterhood + Location)
+9. Data Model (Updated)
+10. API Specification (Updated)
+11. Deployment Architecture
+12. Protected Information Registry
+
+---
+
+## 1. CORE DIFFERENTIATORS (PROTECTED - Internal Only)
+
+| # | Differentiator | Public Description | Internal Implementation |
+|---|----------------|-------------------|------------------------|
+| 1 | Morning Face Required | "Daily vulnerability requirement" | Mandatory photo upload before 11:59 AM local time, streak tracking |
+| 2 | Humor Compatibility | "Proprietary humor analysis" | CMI based on gold standard reactions + LLM embeddings (v2) |
+| 3 | Answers First | "Personality before photos" | Card stack shows answers, faces unlock after 3 ratings |
+| 4 | Trust-Based Safety | "Graduated trust architecture" | 5 levels, 0-200+ points, location only at Level 4+ |
+| 5 | Community Verification | "Peer-vetted safety network" | Sisterhood (women-only), Bad Faith Alerts |
+| 6 | Authenticity Over Polish | "No filters. No retakes." | Camera timestamp verification, EXIF data check |
+
+---
+
+## 2. COMPLETE v1 FEATURE SET
+
+### Phase 0: Foundation (✅ COMPLETE)
+- Supabase project with 8 tables
+- FastAPI backend (15+ endpoints)
+- React + Vite + Tailwind frontend
+- Email/phone authentication
+- Morning face upload with camera
+- Streak tracking
+
+### Phase 1: Onboarding Enhancement (🆕 TO BUILD)
+**Purpose:** Collect psychological and comedic data for matching
+
+| Step | Component | Questions | Est. Time |
+|------|-----------|-----------|-----------|
+| 1 | Email/Phone Verify | - | 2 min |
+| 2 | Basic Profile | Name, birthday, location, gender | 1 min |
+| 3 | Psychological Scales (7) | 50 questions (funny, engaging format) | 8 min |
+| 4 | Baseline CMI | 5 gold standard questions | 3 min |
+| 5 | Attractiveness Calibration | Rate 10 faces | 2 min |
+| 6 | Dealbreakers | Kids, distance, age, politics | 1 min |
+| 7 | First Morning Face | Camera upload | 1 min |
+
+**Total onboarding time:** ~18 minutes
+
+**Psychological Scales Implementation:**
+- Break into sections with progress bar
+- Use card-based UI with emoji reactions
+- Questions phrased humorously (Bad Friends style)
+- Store results in `psychological_profiles` table
+
+**Baseline CMI Questions (Gold Standard):**
+"Would you suck Jamie Lee Curtis's big toe for a Klondike bar?"
+
+"If you had unlimited money, would you buy Janice Joplin's toenail?"
+
+"Would you rather fight one Bobby-Lee-sized ant or 100 ant-sized Bobby Lees?"
+
+"Rate your current tiredness as a weather forecast."
+
+"What's something you're NOT going to feel guilty about today?"
+
+text
+
+### Phase 2: AI Question System (🆕 TO BUILD)
+
+**Question Generation (Nightly at 2 AM):**
+```python
+For each user (max 100 for v1):
+    prompt = f"""
+    Generate 10 funny, absurd questions for a {age}-year-old {gender} in {city}.
+    Mix of:
+    - 5 Bad Friends podcast style questions
+    - 3 dating/relationship questions
+    - 2 current events/pop culture questions
+    Keep each under 20 words.
+    Format as JSON array.
+    """
+    
+    response = groq_client.chat(prompt)  # Uses multiple API keys if needed
+    store in user_questions table with date = tomorrow
+Question Delivery:
+
+User opens app → next unanswered question appears
+
+Track answer time to learn user habits
+
+Schedule next question for typical open time + 2 hours
+
+Max 10 questions per day
+
+Unanswered questions roll over (with 20% daily decay)
+
+Answer Storage:
+
+sql
+CREATE TABLE user_questions (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    question_text TEXT,
+    generated_for_date DATE,
+    answer_text TEXT,
+    answered_at TIMESTAMP,
+    vitality_score DECIMAL(5,2),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+Phase 3: Four Friendship Layers (🆕 TO BUILD)
+Layer Structure:
+
+text
+FRIENDS (Follow)
+├── Action: Follow/Unfollow
+├── Visibility: See morning faces + answers
+├── Feed priority: Normal
+└── Can DM: No (unless also Bad Friends or Worst Friends)
+
+BAD FRIENDS (Mutual Humor)
+├── Trigger: 3+ mutual 💀 reactions in 7 days
+├── Action: Automatic detection + opt-in
+├── Visibility: Full profile access
+├── Feed priority: High
+├── Can DM: Yes (text only)
+└── Special: "Bad Friends" badge, shared challenges
+
+WORST FRIENDS (Romantic Match)
+├── Trigger: Mutual ❤️ in Discover
+├── Action: Both users tap heart
+├── Visibility: Full profile + location (if Trust Level 4+)
+├── Feed priority: Highest
+├── Can DM: Yes (text, voice, media)
+└── Special: "Worst Friends" badge, date planning tools
+
+MATCHES (Pending)
+├── Trigger: One-way ❤️
+├── Action: Waiting for response
+├── Visibility: Limited profile
+├── Feed priority: Low
+└── Expires: 7 days without response
+Phase 4: Single Feed Architecture (🆕 TO BUILD)
+Feed Components (Mixed Card Types):
+
+Card Type	Border Color	Content	Priority Weight
+Friend Morning Face	Blue	Photo + reactions	1.0
+Friend Answer	Orange	Question + answer + CMI	1.0
+Bad Friends Detection	Purple	"3 mutual 💀 detected"	1.5
+Popular Morning Face	Gold	Top 10 by 💀 in last 24h	0.8
+Popular Answer	Gold	Top 10 by CMI in last 24h	0.8
+Sisterhood Alert (women only)	Pink	"New vetting request"	1.2
+Vitality Score Calculation:
+
+python
+vitality_score = (
+    (reaction_count * 0.3) +
+    (unique_reactors * 0.3) +
+    (cmi_score * 0.2) +
+    (1 - days_since_posted * 0.1) +
+    (streak_bonus * 0.1)  # +0.2 for 7+ day streak
+) * 100
+Feed Ordering:
+
+Bad Friends Detection (priority 1.5)
+
+Sisterhood Alerts (priority 1.2, women only)
+
+Friend content (priority 1.0, chronologically)
+
+Popular content (priority 0.8, by vitality)
+
+Phase 5: Discovery & Matching (🆕 TO BUILD)
+Answers First Card Stack:
+
+text
+1. User sees 3 cards with other users' answers to today's question
+2. For each answer, user rates: 💀 (Worst Friend) or SKIP
+3. After 3 ratings → UNLOCK FACES
+4. User sees morning face gallery of rated users
+5. User taps ❤️ or 👎
+6. If mutual → WORST FRIENDS match created
+7. If not mutual → PENDING MATCH
+Matching Algorithm (v1 - Simplified):
+
+python
+match_score = (
+    (humor_compatibility * 0.4) +  # Based on mutual 💀 reactions
+    (personality_compatibility * 0.3) +  # Based on psychological profiles
+    (value_alignment * 0.2) +  # Based on dealbreakers + core values
+    (attractiveness_proximity * 0.1)  # Based on calibration scores
+) * 100
+Phase 6: Safety Architecture (🆕 TO BUILD)
+Sisterhood (Women-Only Verification Network):
+
+sql
+CREATE TABLE sisterhood_posts (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),  -- Anonymous in UI
+    target_user_id UUID REFERENCES users(id),
+    content TEXT,
+    flag_type TEXT,  -- 'green', 'yellow', 'red'
+    created_at TIMESTAMP,
+    expires_at TIMESTAMP  -- 30 days auto-delete
+);
+
+-- RLS: Only women can access
+-- No screenshots allowed (technical + legal warning)
+-- AI post-review for bullying/favoritism
+Sisterhood Rules (Non-negotiable):
+
+ONLY for safety vetting (no favoritism, no bullying)
+
+All posts anonymous to other users
+
+Posts auto-delete after 30 days
+
+AI monitors for abuse of the system
+
+Violations result in permanent ban
+
+Location Safety (Heat Maps - v1):
+
+sql
+CREATE TABLE location_heartbeats (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    lat DECIMAL(10,8),
+    lng DECIMAL(11,8),
+    accuracy INTEGER,  -- meters
+    created_at TIMESTAMP,
+    expires_at TIMESTAMP  -- 24 hours auto-delete
+);
+
+-- Ghost mode: User can hide location entirely
+-- Trust Level 4+ required to share precise location
+-- Aggregated heat maps only (no individual pins)
+Heat Map Implementation (Mapbox - Free Tier):
+
+50,000 map loads per month free
+
+Aggregate user locations into hex bins
+
+Show density, not individuals
+
+"Claim Spot" feature: user can post "I'm at X location"
+
+Phase 7: Chat (v1.3 - Post-Launch)
+Features for v1.3:
+
+Real-time messaging (Supabase Realtime)
+
+Read receipts
+
+Typing indicators
+
+Voice notes (AssemblyAI)
+
+Media sharing (images/GIFs)
+
+Block/report
+
+Not in v1.3 (v2):
+
+Audio calls (WebRTC)
+
+Video calls (WebRTC)
+
+Group chats
+
+3. DATA MODEL (UPDATED)
+New Tables for v1
+sql
+-- User questions (10 per user per day)
+CREATE TABLE user_questions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    question_text TEXT NOT NULL,
+    generated_for_date DATE NOT NULL,
+    answer_text TEXT,
+    answered_at TIMESTAMP,
+    vitality_score DECIMAL(5,2) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Sisterhood posts
+CREATE TABLE sisterhood_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    target_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    flag_type TEXT CHECK (flag_type IN ('green', 'yellow', 'red')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP DEFAULT NOW() + INTERVAL '30 days'
+);
+
+-- Location heartbeats (temp data)
+CREATE TABLE location_heartbeats (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    lat DECIMAL(10,8),
+    lng DECIMAL(11,8),
+    accuracy INTEGER,
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP DEFAULT NOW() + INTERVAL '24 hours'
+);
+
+-- Follows (friendship layer 1)
+CREATE TABLE follows (
+    follower_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    followed_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (follower_id, followed_id)
+);
+
+-- Bad Friends (layer 2 - automatic detection)
+CREATE TABLE bad_friends (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_a UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_b UUID REFERENCES users(id) ON DELETE CASCADE,
+    detected_at TIMESTAMP DEFAULT NOW(),
+    accepted_at TIMESTAMP,
+    UNIQUE(user_a, user_b)
+);
+
+-- Worst Friends (layer 3 - romantic matches)
+-- Reuses existing matches table
+
+-- Pending matches (layer 4)
+-- Reuses existing matches table with status='pending'
+Updated RLS Policies
+sql
+-- Sisterhood: Only women can access
+CREATE POLICY "Women only can access sisterhood"
+    ON sisterhood_posts
+    FOR ALL
+    USING (
+        auth.uid() IN (
+            SELECT auth_id FROM users WHERE gender = 'woman'
+        )
+    );
+
+-- Location heartbeats: Only user can see own, expires after 24h
+CREATE POLICY "Users can manage own location"
+    ON location_heartbeats
+    FOR ALL
+    USING (user_id = auth.uid());
+
+-- Bad Friends: Only participants can see
+CREATE POLICY "Bad Friends participants only"
+    ON bad_friends
+    FOR SELECT
+    USING (user_a = auth.uid() OR user_b = auth.uid());
+4. API SPECIFICATION (UPDATED)
+New Endpoints for v1
+python
+# Onboarding
+POST /onboarding/psychological  # Submit 50 answers
+POST /onboarding/baseline-cmi   # Submit 5 gold standard answers
+POST /onboarding/calibration    # Submit 10 face ratings
+POST /onboarding/dealbreakers   # Submit preferences
+
+# Questions
+GET /questions/my-today          # Get user's next unanswered question
+POST /questions/answer/{id}      # Answer a specific question
+GET /questions/my-vitality       # Get user's vitality dashboard
+
+# Social
+POST /friends/follow/{user_id}
+DELETE /friends/follow/{user_id}
+GET /friends/list                # Get all friends (Layer 1)
+GET /bad-friends/list            # Get all Bad Friends (Layer 2)
+GET /worst-friends/list          # Get all Worst Friends (Layer 3)
+GET /matches/pending             # Get pending matches (Layer 4)
+
+# Feed
+GET /feed                        # Mixed feed with all card types
+GET /feed/vitality               # Get vitality scores for user's content
+
+# Safety
+POST /sisterhood/post            # Create anonymous vetting post
+GET /sisterhood/feed             # Get sisterhood feed (women only)
+POST /sisterhood/flag/{post_id}  # Flag abuse of sisterhood
+
+POST /location/heartbeat         # Update location (Level 4+)
+GET /location/heatmap            # Get aggregated heat map
+POST /location/ghost-mode        # Toggle ghost mode
+
+# Discovery
+GET /discover/candidates         # Get card stack (answers first)
+POST /discover/rate/{answer_id}  # Rate answer (💀 or SKIP)
+POST /discover/like/{user_id}    # Like user after face unlock
+5. PROTECTED INFORMATION REGISTRY
+NEVER expose in public pages, documentation, or client-side code:
+
+Information	Where it lives	Exposure Risk
+CMI calculation formula	Backend service	High - protect
+Trust level point thresholds	Backend + DB	Medium - vague public description OK
+Sisterhood verification process	Backend + RLS	High - protect
+Groq prompt engineering	Backend .env	High - protect
+Matching algorithm weights	Backend service	High - protect
+Location aggregation method	Backend service	Medium - vague description OK
+Psychological scale scoring	Backend service	Medium
+Attractiveness calibration formula	Backend service	Medium
+Safe to expose publicly:
+
+Feature list (without implementation details)
+
+User flows (high-level)
+
+Technology stack (Supabase, FastAPI, React)
+
+Team information
+
+Business projections (investor page)
+
+Market analysis (investor page)
+
+6. DEPLOYMENT ARCHITECTURE (UNCHANGED)
+text
+Frontend: Netlify (free tier, 100GB bandwidth)
+Backend: Render (free tier, spins down after 15 min)
+Database: Supabase (free tier, 500MB, 2M requests)
+LLM: Groq (free tier, 30 req/min per key - use multiple keys)
+Maps: Mapbox (free tier, 50k requests/mo)
+Voice: AssemblyAI (free tier, 100 hrs/mo - v1.3)
+Cron: cron-job.org (free, 50 monitors)
+Uptime: UptimeRobot (free, 50 monitors)
+7. COST LIMITS & BETA HANDLING
+Monthly limits for free tier:
+
+Service	Limit	Action when approaching
+Supabase	500MB DB, 2M requests	Show "Bad Friends is growing. Help us scale!"
+Render	100GB bandwidth	Same as above
+Groq	30 req/min per key	Add more API keys
+Mapbox	50k map loads	Reduce heat map refresh rate
+Beta user handling:
+
+javascript
+if (userCount >= 100) {
+    showMessage(`
+        🍜 Bad Friends is in private beta.
+        
+        We're at capacity right now (100 active users).
+        
+        Want to help us scale? 
+        - Donate to keep the servers running
+        - Join the waitlist for v1.1
+        
+        Your support keeps the ant traps running.
+    `)
+}
+---
 Bad Friends Morning Face Build — Complete System Architecture
 Version: 1.0 | April 2026
 Status: Ready for Development
