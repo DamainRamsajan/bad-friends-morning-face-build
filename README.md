@@ -158,7 +158,7 @@ Real Woman Badge: Earned after 30-day streak + endorsements from verified women.
 This is a closed-source project for the Bad Friends podcast community. For bug reports or feature requests, please contact the development team.
 
 📧 Contact
-Email for verification service accounts: carlosinthebooth@gmail.com
+Email for verification service accounts: peterdramsajan@gmail.com
 
 🙏 Acknowledgments
 Bad Friends Podcast (Bobby Lee & Andrew Santino) for the chaotic, absurdist humor that inspired this app
