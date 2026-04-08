@@ -5,6 +5,7 @@ from supabase import create_client, Client
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from services.friendship_service import friendship_service
 
 load_dotenv()
 
@@ -168,6 +169,65 @@ async def get_baseline_questions():
     
     return {"success": True, "questions": fallback}
 
+# =====================================================
+# FRIENDSHIP ENDPOINTS (Layer 1-4)
+# =====================================================
+
+@app.post("/friends/follow/{user_id}")
+async def follow_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot follow yourself")
+    result = await friendship_service.follow(current_user["id"], user_id)
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result.get("message", "Already following"))
+    return result
+
+@app.delete("/friends/follow/{user_id}")
+async def unfollow_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    result = await friendship_service.unfollow(current_user["id"], user_id)
+    return result
+
+@app.get("/friends/followers")
+async def get_my_followers(current_user: dict = Depends(get_current_user)):
+    followers = await friendship_service.get_followers(current_user["id"])
+    return {"success": True, "followers": followers}
+
+@app.get("/friends/following")
+async def get_my_following(current_user: dict = Depends(get_current_user)):
+    following = await friendship_service.get_following(current_user["id"])
+    return {"success": True, "following": following}
+
+@app.get("/bad-friends/list")
+async def get_bad_friends(current_user: dict = Depends(get_current_user)):
+    friends = await friendship_service.get_bad_friends(current_user["id"])
+    return {"success": True, "bad_friends": friends}
+
+@app.get("/bad-friends/pending")
+async def get_pending_bad_friends(current_user: dict = Depends(get_current_user)):
+    pending = await friendship_service.get_pending_bad_friends(current_user["id"])
+    return {"success": True, "pending": pending}
+
+@app.post("/bad-friends/accept/{user_id}")
+async def accept_bad_friend(user_id: str, current_user: dict = Depends(get_current_user)):
+    result = await friendship_service.accept_bad_friend(current_user["id"], user_id)
+    if not result["success"]:
+        raise HTTPException(status_code=404, detail="Bad Friend request not found")
+    return {"success": True}
+
+@app.get("/worst-friends/list")
+async def get_worst_friends(current_user: dict = Depends(get_current_user)):
+    matches = await friendship_service.get_worst_friends(current_user["id"])
+    return {"success": True, "worst_friends": matches}
+
+@app.get("/matches/pending")
+async def get_pending_matches(current_user: dict = Depends(get_current_user)):
+    pending = await friendship_service.get_pending_matches(current_user["id"])
+    return {"success": True, "pending": pending}
+
+@app.get("/friends/summary")
+async def get_friendship_summary(current_user: dict = Depends(get_current_user)):
+    summary = await friendship_service.get_friendship_summary(current_user["id"])
+    return {"success": True, "summary": summary}
 # =====================================================
 # EXISTING ENDPOINTS (unchanged)
 # =====================================================
