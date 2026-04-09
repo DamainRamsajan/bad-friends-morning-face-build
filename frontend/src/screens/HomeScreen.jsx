@@ -29,7 +29,6 @@ const HomeScreen = () => {
       if (data.success) {
         setStreak(data.profile.streak_days || 0);
         if (data.profile.name) setUserName(data.profile.name);
-        // Calculate simple CMI from reactions if available
         if (data.profile.cmi_score) setCmiScore(data.profile.cmi_score);
       }
     } catch (error) {
@@ -50,7 +49,6 @@ const HomeScreen = () => {
         if (data.success && data.faces.length > 0) {
           setFeedItems(data.faces);
         } else {
-          // Use funny mock data for Damian
           setFeedItems(getMockFeedData('faces', userName));
         }
       } else if (activeTab === 'answers') {
@@ -64,7 +62,6 @@ const HomeScreen = () => {
           setFeedItems(getMockFeedData('answers', userName));
         }
       } else if (activeTab === 'popular') {
-        // For popular tab, combine and sort by dead reactions
         const facesRes = await fetch(`${API_URL}/morning-face/feed`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -89,7 +86,6 @@ const HomeScreen = () => {
       }
     } catch (error) {
       console.error('Error fetching feed:', error);
-      // Fallback to mock data
       if (activeTab === 'faces') setFeedItems(getMockFeedData('faces'));
       else setFeedItems(getMockFeedData('answers'));
     } finally {
@@ -112,7 +108,6 @@ const HomeScreen = () => {
           reaction_type: reactionType
         })
       });
-      // Refresh feed to show updated counts
       fetchFeed();
     } catch (error) {
       console.error('Error adding reaction:', error);
@@ -139,6 +134,13 @@ const HomeScreen = () => {
             <button className="bf-btn-icon text-badfriends-text-muted text-lg">🔍</button>
           </div>
         </div>
+        
+        {/* Banner Image */}
+        <img 
+          src="/BFMF_Banner..png" 
+          alt="Bad Friends Morning Face" 
+          className="w-full rounded-2xl mb-4"
+        />
         
         {/* Morning Face Section - Compact */}
         <div className="bf-card mb-4">
@@ -242,7 +244,7 @@ const HomeScreen = () => {
                   </div>
                 )}
                 
-                {/* Caption/Caption */}
+                {/* Caption */}
                 {activeTab === 'faces' && item.caption && (
                   <p className="bf-text-dim text-xs mb-2 italic">"{item.caption}"</p>
                 )}

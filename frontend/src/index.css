@@ -2,20 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-badfriends-bg text-badfriends-text;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
+/* Bad Friends Brand Background - Orange/Yellow Gradient */
+body {
+  background: linear-gradient(135deg, #f97316 0%, #f59e0b 50%, #f97316 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Cards float on top with dark background */
+.bf-card {
+  background: #111827;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Override any direct bg-badfriends-bg to use gradient */
+.bg-badfriends-bg {
+  background: transparent !important;
+}
+
+/* Keep dark backgrounds for cards and inputs */
+.bg-badfriends-card, .bf-card {
+  background: #111827;
+}
+
+.bg-badfriends-input {
+  background: #1f2937;
 }
 
 @layer components {
-  /* Cards */
-  .bf-card {
-    @apply bg-badfriends-card border border-badfriends-border rounded-2xl p-4;
-  }
-  
-  /* Buttons */
   .bf-btn-primary {
     @apply bg-primary text-white font-bold py-3 px-6 rounded-xl uppercase tracking-wide 
            transition-all duration-200 active:scale-95 hover:bg-primary-dark 
@@ -26,7 +43,6 @@
     @apply p-3 rounded-xl transition-all duration-200 active:scale-95;
   }
   
-  /* Inputs */
   .bf-input {
     @apply w-full bg-badfriends-input border border-badfriends-border rounded-xl 
            px-4 py-3 text-badfriends-text placeholder-badfriends-text-dim 
@@ -39,7 +55,6 @@
            focus:outline-none focus:border-primary transition-colors resize-none;
   }
   
-  /* Typography */
   .bf-header-lg {
     @apply text-3xl font-extrabold uppercase tracking-tight;
   }
@@ -60,7 +75,6 @@
     @apply text-badfriends-text-dim;
   }
   
-  /* Progress Bar */
   .bf-progress-bar {
     @apply w-full bg-gray-800 rounded-full h-2;
   }
@@ -69,23 +83,26 @@
     @apply bg-primary h-2 rounded-full transition-all duration-300;
   }
   
-  /* Badges */
   .bf-badge-primary {
     @apply bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold;
   }
   
-  /* Reaction Buttons */
   .bf-reaction {
     @apply flex items-center gap-1 text-badfriends-text-dim transition-colors;
   }
   
-  .bf-reaction-bobo { @apply hover:text-bobo; }
-  .bf-reaction-cheeto { @apply hover:text-cheeto; }
-  .bf-reaction-tiger { @apply hover:text-tiger; }
-  .bf-reaction-dead { @apply hover:text-dead; }
+  .bf-reaction-bobo:hover { @apply text-bobo; }
+  .bf-reaction-cheeto:hover { @apply text-cheeto; }
+  .bf-reaction-tiger:hover { @apply text-tiger; }
+  .bf-reaction-dead:hover { @apply text-dead; }
   
-  /* Loading Spinner */
   .bf-spinner {
     @apply animate-spin rounded-full h-8 w-8 border-b-2 border-primary;
+  }
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }

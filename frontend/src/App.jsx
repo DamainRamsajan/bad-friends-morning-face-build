@@ -51,6 +51,16 @@ function AppContent() {
     return
   }
   
+  // First check localStorage for fast response
+  const localFlag = localStorage.getItem('bf_onboarding_complete');
+  if (localFlag === 'true') {
+    console.log('Using localStorage flag - onboarding complete');
+    setHasCompletedOnboarding(true);
+    setCheckingOnboarding(false);
+    return;
+  }
+  
+  // Fallback to API check
   try {
     const token = (await supabase.auth.getSession()).data.session?.access_token
     const response = await fetch(`${API_URL}/profile`, {
@@ -58,9 +68,13 @@ function AppContent() {
     })
     const data = await response.json()
     
+    console.log('API check - onboarding_complete:', data.profile?.onboarding_complete)
+    
     if (data.success && data.profile) {
-      // Check if onboarding is complete using the new column
       const onboardingComplete = data.profile.onboarding_complete === true
+      if (onboardingComplete) {
+        localStorage.setItem('bf_onboarding_complete', 'true');
+      }
       setHasCompletedOnboarding(onboardingComplete)
       setUserGender(data.profile.gender)
     }
@@ -93,7 +107,7 @@ function AppContent() {
       <Route path="/onboarding" element={user ? <OnboardingScreen /> : <Navigate to="/login" />} />
       
       {/* App Routes */}
-      <Route path="/app" element={user && hasCompletedOnboarding ? <HomeScreen /> : <Navigate to="/onboarding" />} />
+      <Route path="/app" element={user ? <HomeScreen /> : <Navigate to="/login" />} />
       <Route path="/app/feed" element={user && hasCompletedOnboarding ? <HomeScreen /> : <Navigate to="/onboarding" />} />
       <Route path="/app/discover" element={user && hasCompletedOnboarding ? <DiscoverScreen /> : <Navigate to="/onboarding" />} />
       <Route path="/app/matches" element={user && hasCompletedOnboarding ? <MatchesScreen /> : <Navigate to="/onboarding" />} />

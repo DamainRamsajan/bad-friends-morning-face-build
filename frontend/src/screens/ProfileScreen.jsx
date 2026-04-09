@@ -42,6 +42,7 @@ const ProfileScreen = () => {
   };
   
   const handleLogout = async () => {
+    localStorage.removeItem('bf_onboarding_complete');
     await supabase.auth.signOut();
     window.location.href = '/';
   };

@@ -83,26 +83,31 @@ const OnboardingScreen = () => {
   };
   
   const saveDealbreakers = async (data) => {
-    setLoading(true);
-    try {
-      const token = await getToken();
-      await fetch(`${API_URL}/onboarding/dealbreakers`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-      });
+  setLoading(true);
+  try {
+    const token = await getToken();
+    const response = await fetch(`${API_URL}/onboarding/dealbreakers`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (response.ok) {
       setDealbreakersData(data);
-      // Onboarding complete - redirect to app
-      navigate('/app');
-    } catch (error) {
-      console.error('Error saving dealbreakers:', error);
-    } finally {
-      setLoading(false);
+      // Store in localStorage immediately
+      localStorage.setItem('bf_onboarding_complete', 'true');
+      // Redirect to app
+      window.location.href = '/app';
     }
-  };
+  } catch (error) {
+    console.error('Error saving dealbreakers:', error);
+  } finally {
+    setLoading(false);
+  }
+};
   
   if (loading) {
     return (
