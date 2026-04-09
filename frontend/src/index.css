@@ -2,8 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #0a0e1a;
-  color: #f0f4f8;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+@layer base {
+  body {
+    @apply bg-badfriends-bg text-badfriends-text;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  /* Cards */
+  .bf-card {
+    @apply bg-badfriends-card border border-badfriends-border rounded-2xl p-4;
+  }
+  
+  /* Buttons */
+  .bf-btn-primary {
+    @apply bg-primary text-white font-bold py-3 px-6 rounded-xl uppercase tracking-wide 
+           transition-all duration-200 active:scale-95 hover:bg-primary-dark 
+           disabled:opacity-50 disabled:active:scale-100;
+  }
+  
+  .bf-btn-icon {
+    @apply p-3 rounded-xl transition-all duration-200 active:scale-95;
+  }
+  
+  /* Inputs */
+  .bf-input {
+    @apply w-full bg-badfriends-input border border-badfriends-border rounded-xl 
+           px-4 py-3 text-badfriends-text placeholder-badfriends-text-dim 
+           focus:outline-none focus:border-primary transition-colors;
+  }
+  
+  .bf-textarea {
+    @apply w-full bg-badfriends-input border border-badfriends-border rounded-xl 
+           px-4 py-3 text-badfriends-text placeholder-badfriends-text-dim 
+           focus:outline-none focus:border-primary transition-colors resize-none;
+  }
+  
+  /* Typography */
+  .bf-header-lg {
+    @apply text-3xl font-extrabold uppercase tracking-tight;
+  }
+  
+  .bf-header-sm {
+    @apply text-lg font-semibold uppercase tracking-wide;
+  }
+  
+  .bf-tagline {
+    @apply text-badfriends-text-muted text-sm;
+  }
+  
+  .bf-text-muted {
+    @apply text-badfriends-text-muted;
+  }
+  
+  .bf-text-dim {
+    @apply text-badfriends-text-dim;
+  }
+  
+  /* Progress Bar */
+  .bf-progress-bar {
+    @apply w-full bg-gray-800 rounded-full h-2;
+  }
+  
+  .bf-progress-fill {
+    @apply bg-primary h-2 rounded-full transition-all duration-300;
+  }
+  
+  /* Badges */
+  .bf-badge-primary {
+    @apply bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  /* Reaction Buttons */
+  .bf-reaction {
+    @apply flex items-center gap-1 text-badfriends-text-dim transition-colors;
+  }
+  
+  .bf-reaction-bobo { @apply hover:text-bobo; }
+  .bf-reaction-cheeto { @apply hover:text-cheeto; }
+  .bf-reaction-tiger { @apply hover:text-tiger; }
+  .bf-reaction-dead { @apply hover:text-dead; }
+  
+  /* Loading Spinner */
+  .bf-spinner {
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-primary;
+  }
 }

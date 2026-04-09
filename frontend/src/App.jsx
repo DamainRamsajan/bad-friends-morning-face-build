@@ -5,6 +5,7 @@ import { useAuth, AuthProvider } from './contexts/AuthContext'
 import { supabase } from './utils/supabaseClient'
 
 // Public Screens
+import HomeScreen from './screens/HomeScreen';
 import LandingScreen from './screens/LandingScreen'
 import FeaturesScreen from './screens/FeaturesScreen'
 import InvestorScreen from './screens/InvestorScreen'
@@ -32,68 +33,8 @@ const LoadingScreen = () => (
   </div>
 )
 
-// HomeScreen Component (inline since it was never extracted)
-const HomeScreen = () => {
-  const [streak, setStreak] = useState(0)
-  const [userName, setUserName] = useState('')
-  const [hasUploadedToday, setHasUploadedToday] = useState(false)
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-  
-  useEffect(() => {
-    fetchProfile()
-  }, [])
-  
-  const fetchProfile = async () => {
-    try {
-      const token = (await supabase.auth.getSession()).data.session?.access_token
-      const response = await fetch(`${API_URL}/profile`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      const data = await response.json()
-      if (data.success) {
-        setStreak(data.profile.streak_days || 0)
-        setUserName(data.profile.name || data.profile.email?.split('@')[0] || 'Friend')
-        if (data.profile.last_morning_face) {
-          const lastUpload = new Date(data.profile.last_morning_face).toISOString().split('T')[0]
-          const today = new Date().toISOString().split('T')[0]
-          setHasUploadedToday(lastUpload === today)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error)
-    }
-  }
-  
-  return (
-    <div className="min-h-screen bg-[#0a0e1a] pb-20">
-      <div className="max-w-md mx-auto p-4">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-white">🍜 Bad Friends</h1>
-          <p className="text-gray-400 text-sm">Morning faces. Bad jokes. Real matches.</p>
-          {streak > 0 && (
-            <div className="inline-block mt-2 px-3 py-1 bg-cheeto/20 border border-cheeto rounded-full">
-              <span className="text-cheeto text-xs font-semibold">🔥 {streak} day streak</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="bg-[#1a1f2e] rounded-xl border border-gray-800 p-4">
-          <h2 className="text-white font-semibold mb-2">🌅 Morning Face</h2>
-          <p className="text-gray-400 text-xs mb-3">Coming soon...</p>
-        </div>
-        
-        <div className="text-center mt-6">
-          <button 
-            onClick={() => supabase.auth.signOut()}
-            className="text-gray-500 text-xs hover:text-gray-400 transition"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+// HomeScreen Component (inline since it was never extracted) Until it was extracted
+
 
 function AppContent() {
   const { user, loading } = useAuth()
