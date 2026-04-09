@@ -280,11 +280,14 @@ async def save_dealbreakers(
     data: dict,
     current_user: dict = Depends(get_current_user)
 ):
-    """Save user dealbreakers"""
+    """Save user dealbreakers and mark onboarding complete"""
+    # Save dealbreakers
     result = supabase.table("users").update({
-        "dealbreakers": data
+        "dealbreakers": data,
+        "onboarding_complete": True
     }).eq("id", current_user["id"]).execute()
-    return {"success": True}
+    
+    return {"success": True, "onboarding_complete": True}
 
 # =====================================================
 # EXISTING ENDPOINTS (unchanged)

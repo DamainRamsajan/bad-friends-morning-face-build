@@ -105,29 +105,30 @@ function AppContent() {
   
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (!user) {
-        setCheckingOnboarding(false)
-        return
-      }
-      
-      try {
-        const token = (await supabase.auth.getSession()).data.session?.access_token
-        const response = await fetch(`${API_URL}/profile`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-        const data = await response.json()
-        
-        if (data.success && data.profile) {
-          const hasPsychProfile = data.profile.psychological_profile_complete || false
-          setHasCompletedOnboarding(hasPsychProfile)
-          setUserGender(data.profile.gender)
-        }
-      } catch (error) {
-        console.error('Error checking onboarding:', error)
-      } finally {
-        setCheckingOnboarding(false)
-      }
+  if (!user) {
+    setCheckingOnboarding(false)
+    return
+  }
+  
+  try {
+    const token = (await supabase.auth.getSession()).data.session?.access_token
+    const response = await fetch(`${API_URL}/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    const data = await response.json()
+    
+    if (data.success && data.profile) {
+      // Check if onboarding is complete using the new column
+      const onboardingComplete = data.profile.onboarding_complete === true
+      setHasCompletedOnboarding(onboardingComplete)
+      setUserGender(data.profile.gender)
     }
+  } catch (error) {
+    console.error('Error checking onboarding:', error)
+  } finally {
+    setCheckingOnboarding(false)
+  }
+}
     
     checkOnboardingStatus()
   }, [user])
