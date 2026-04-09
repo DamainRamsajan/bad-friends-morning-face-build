@@ -117,11 +117,29 @@ async def get_today_question(current_user: dict = Depends(get_current_user)):
     return {"success": True, "question": {"id": question["id"], "question_text": question["question_text"], "date": question["date"], "has_answered": len(answer_result.data) > 0}}
 
 @app.post("/questions/answer")
-async def submit_answer(question_id: str = Form(...), answer_text: str = Form(...), current_user: dict = Depends(get_current_user)):
-    existing = supabase.table("answers").select("*").eq("user_id", current_user["id"]).eq("question_id", question_id).execute()
-    if existing.data:
-        raise HTTPException(status_code=400, detail="Already answered")
-    answer_data = {"user_id": current_user["id"], "question_id": question_id, "answer_text": answer_text}
+async def submit_answer(
+    question_id: str = Form(...), 
+    answer_text: str = Form(...), 
+    current_user: dict = Depends(get_current_user)
+):
+    # Check if this is a baseline question
+    question = supabase.table("daily_questions").select("is_baseline").eq("id", question_id).execute()
+    is_baseline = question.data[0].get("is_baseline", False) if question.data else False
+    
+    if is_baseline:
+        # For baseline questions, delete existing answer first
+        supabase.table("answers").delete().eq("user_id", current_user["id"]).eq("question_id", question_id).execute()
+    else:
+        # For daily questions, check if already answered
+        existing = supabase.table("answers").select("*").eq("user_id", current_user["id"]).eq("question_id", question_id).execute()
+        if existing.data:
+            raise HTTPException(status_code=400, detail="Already answered")
+    
+    answer_data = {
+        "user_id": current_user["id"], 
+        "question_id": question_id, 
+        "answer_text": answer_text
+    }
     result = supabase.table("answers").insert(answer_data).execute()
     return {"success": True, "answer_id": result.data[0]["id"]}
 
@@ -238,10 +256,7 @@ async def save_psychological_data(
     data: dict,
     current_user: dict = Depends(get_current_user)
 ):
-    """Save psychological profile answers"""
-    
-    # First check if profile exists
-    existing = supabase.table("psychological_profiles").select("id").eq("user_id", current_user["id"]).execute()
+    """Save psychological profile answers (upsert to avoid duplicates)"""
     
     profile_data = {
         "user_id": current_user["id"],
@@ -255,12 +270,11 @@ async def save_psychological_data(
         "updated_at": datetime.now().isoformat()
     }
     
-    if existing.data:
-        # Update existing record
-        result = supabase.table("psychological_profiles").update(profile_data).eq("user_id", current_user["id"]).execute()
-    else:
-        # Insert new record
-        result = supabase.table("psychological_profiles").insert(profile_data).execute()
+    # Use PostgREST upsert with on_conflict
+    result = supabase.table("psychological_profiles").upsert(
+        profile_data,
+        on_conflict="user_id"
+    ).execute()
     
     return {"success": True}
 
