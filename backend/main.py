@@ -18,7 +18,7 @@ app = FastAPI(title="Bad Friends API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -228,6 +228,64 @@ async def get_pending_matches(current_user: dict = Depends(get_current_user)):
 async def get_friendship_summary(current_user: dict = Depends(get_current_user)):
     summary = await friendship_service.get_friendship_summary(current_user["id"])
     return {"success": True, "summary": summary}
+
+# =====================================================
+# ONBOARDING ENDPOINTS
+# =====================================================
+
+@app.post("/onboarding/psychological")
+async def save_psychological_data(
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save psychological profile answers"""
+    
+    # First check if profile exists
+    existing = supabase.table("psychological_profiles").select("id").eq("user_id", current_user["id"]).execute()
+    
+    profile_data = {
+        "user_id": current_user["id"],
+        "big_five": data.get("big_five"),
+        "attachment_style": data.get("attachment_style"),
+        "love_languages": data.get("love_languages"),
+        "core_values": data.get("core_values"),
+        "conflict_style": data.get("conflict_style"),
+        "humor_style": data.get("humor_style"),
+        "sensation_seeking": data.get("sensation_seeking"),
+        "updated_at": datetime.now().isoformat()
+    }
+    
+    if existing.data:
+        # Update existing record
+        result = supabase.table("psychological_profiles").update(profile_data).eq("user_id", current_user["id"]).execute()
+    else:
+        # Insert new record
+        result = supabase.table("psychological_profiles").insert(profile_data).execute()
+    
+    return {"success": True}
+
+@app.post("/onboarding/calibration")
+async def save_calibration_data(
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save attractiveness calibration ratings"""
+    result = supabase.table("users").update({
+        "attractiveness_score": data.get("calibration_score")
+    }).eq("id", current_user["id"]).execute()
+    return {"success": True}
+
+@app.post("/onboarding/dealbreakers")
+async def save_dealbreakers(
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save user dealbreakers"""
+    result = supabase.table("users").update({
+        "dealbreakers": data
+    }).eq("id", current_user["id"]).execute()
+    return {"success": True}
+
 # =====================================================
 # EXISTING ENDPOINTS (unchanged)
 # =====================================================

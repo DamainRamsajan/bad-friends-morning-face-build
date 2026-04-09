@@ -1,5 +1,117 @@
 
+markdown
+---
+## UPDATE: April 8, 2026 - 11:14 PM (Post-Phase 6.4 through 6.9)
 
+### NEWLY COMPLETED (Since last PROJECT_STATE.md)
+
+| Step | Component | Status | Timestamp |
+|------|-----------|--------|-----------|
+| 6.4.1 | Database tables (bad_friends, triggers, functions) | ✅ Complete | April 9, 2:00 PM |
+| 6.4.2 | `backend/services/friendship_service.py` | ✅ Created | April 9, 2:15 PM |
+| 6.4.3 | Friendship endpoints in `main.py` (10 new endpoints) | ✅ Added | April 9, 2:30 PM |
+| 6.4.4 | `backend/services/__init__.py` | ✅ Created | April 9, 2:30 PM |
+| 6.5 | `frontend/src/screens/MatchesScreen.jsx` | ✅ Created | April 9, 3:00 PM |
+| 6.6 | `frontend/src/screens/ProfileScreen.jsx` | ✅ Created | April 9, 3:15 PM |
+| 6.7 | `frontend/src/components/BottomNav.jsx` | ✅ Updated | April 9, 3:30 PM |
+| 6.8 | `frontend/src/App.jsx` routes | ✅ Fixed | April 9, 3:45 PM |
+| 6.9 | Testing and verification | ✅ Complete | April 9, 4:00 PM |
+
+### NEW FILES THAT NOW EXIST
+backend/services/init.py ✅ NEW
+backend/services/friendship_service.py ✅ NEW
+frontend/src/screens/MatchesScreen.jsx ✅ NEW
+frontend/src/screens/ProfileScreen.jsx ✅ NEW
+
+text
+
+### UPDATED FILES
+backend/main.py ✅ Added friendship endpoints
+frontend/src/components/BottomNav.jsx ✅ Updated with all tabs
+frontend/src/App.jsx ✅ Fixed (HomeScreen inline)
+
+text
+
+### NEW ENDPOINTS NOW AVAILABLE
+
+| Endpoint | Method | Added |
+|----------|--------|-------|
+| `/friends/follow/{user_id}` | POST | April 9 |
+| `/friends/follow/{user_id}` | DELETE | April 9 |
+| `/friends/followers` | GET | April 9 |
+| `/friends/following` | GET | April 9 |
+| `/bad-friends/list` | GET | April 9 |
+| `/bad-friends/pending` | GET | April 9 |
+| `/bad-friends/accept/{user_id}` | POST | April 9 |
+| `/worst-friends/list` | GET | April 9 |
+| `/matches/pending` | GET | April 9 |
+| `/friends/summary` | GET | April 9 |
+
+### WHAT STILL DOES NOT EXIST (No change from previous state)
+❌ frontend/src/screens/DiscoverScreen.jsx
+❌ frontend/src/screens/SisterhoodScreen.jsx
+❌ frontend/src/screens/HomeScreen.jsx (still inline in App.jsx)
+❌ frontend/src/components/Banner.jsx
+❌ frontend/src/components/DailyQuestion.jsx
+❌ frontend/src/components/Feed.jsx
+❌ frontend/src/components/FeedCard.jsx
+
+text
+
+### CURRENT STATUS AS OF April 8, 2026 - 11:15 PM
+
+| Component | Status |
+|-----------|--------|
+| Backend | ✅ Running on port 8000 |
+| Frontend | ✅ Running on port 5173 |
+| Authentication | ✅ Working |
+| Morning face upload | ✅ Working |
+| Friendship backend | ✅ Complete |
+| MatchesScreen UI | ✅ Complete |
+| ProfileScreen UI | ✅ Complete |
+| BottomNav | ✅ Complete |
+| DiscoverScreen | ❌ Not started |
+| Sisterhood | ❌ Not started |
+
+### NEXT STEP (Pending confirmation)
+
+**Step 6.10: Create DiscoverScreen** - Card stack for matching (answers first, 3 ratings to unlock faces)
+
+---
+
+April 8, 1004pm
+
+bad-friends-morning-face-build/
+├── backend/
+│   ├── main.py                    ✅ Updated with friendship endpoints
+│   ├── .env                       ✅ Keys (your existing)
+│   ├── requirements.txt           ✅ Dependencies
+│   └── services/
+│       ├── __init__.py            ✅ Created
+│       └── friendship_service.py  ✅ Created
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx                ✅ Complete routes
+│   │   ├── screens/
+│   │   │   ├── LandingScreen.jsx  ✅
+│   │   │   ├── FeaturesScreen.jsx ✅
+│   │   │   ├── InvestorScreen.jsx ✅
+│   │   │   ├── RegisterScreen.jsx ✅
+│   │   │   ├── LoginScreen.jsx    ✅
+│   │   │   ├── OnboardingScreen.jsx ✅
+│   │   │   ├── HomeScreen.jsx     ⏳ Needs Feed
+│   │   │   ├── MatchesScreen.jsx  ❌ Next
+│   │   │   └── ProfileScreen.jsx  ❌ Next
+│   │   └── components/
+│   │       ├── BottomNav.jsx      ⏳ Needs update
+│   │       └── MorningFaceCapture.jsx ✅
+│   └── .env                       ✅ API URL
+└── docs/
+    ├── architecture.md
+    ├── context.md
+    ├── roadmap.md
+    ├── wireframe.md
+    └── PROJECT_STATE.md           ✅ Updated
 
 Date: April 8, 2026, 12:39pm
 Status: Backend + Frontend Running | Auth Working | Morning Face Upload Working

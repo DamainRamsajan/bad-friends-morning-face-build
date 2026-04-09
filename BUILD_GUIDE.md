@@ -1,3 +1,29 @@
+Updated Step Plan (From Here to v1 Launch) april  8th 2026 11:24pm
+Here are the remaining steps in order with estimated times:
+
+#	Step	Component	Est. Time
+Phase 6 Completion			
+6.12	DailyQuestion component	Display question, submit answer	30 min
+6.13	Banner component	Top banner with streak as prop	15 min
+6.14	Extract HomeScreen	Move inline to separate file	15 min
+Phase 7			
+7.1	Feed component	Show friends' morning faces	45 min
+7.2	FeedCard component	Card with reactions	30 min
+7.3	Reaction integration	Connect to /reactions endpoint	20 min
+Phase 8 Completion			
+8.1	Real matching logic	Replace mock data in Discover	45 min
+8.2	Like/mutual match	Full match creation flow	30 min
+Phase 9			
+9.1	Chat list screen	Show active matches	30 min
+9.2	Chat detail screen	Real-time messaging	45 min
+9.3	Message read receipts	Typing indicators	20 min
+Phase 10			
+10.1	Deploy backend to Render	Production API	30 min
+10.2	Deploy frontend to Netlify	Production app	20 min
+10.3	Set up UptimeRobot	Prevent cold starts	10 min
+10.4	Final testing	Smoke test all features	30 min
+Total remaining time: ~6.5 hours
+
 BUILD GUIDE - Phase 6: From Current State to Complete v1 April 8th, 2026, 2:54pm
 Current State (End of Phase 5 - Verified Working)
 text
