@@ -127,13 +127,8 @@ const HomeScreen = () => {
       <div className="max-w-md mx-auto p-4">
         
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="bf-header-lg">🍜 Bad Friends</h1>
-          <div className="flex gap-2">
-            <button className="bf-btn-icon text-badfriends-text-muted text-lg">🔔</button>
-            <button className="bf-btn-icon text-badfriends-text-muted text-lg">🔍</button>
-          </div>
-        </div>
+        
+        
         
         {/* Banner Image */}
         <img 

@@ -1,22 +1,49 @@
+/*
+  Bad Friends Morning Face — App.css
+  Brand: BF Morning Face
+  Palette: Orange · Yellow · White · Black
+*/
+
+/* ─── CSS Variables ─────────────────────────────── */
+:root {
+  --accent:        #f5820a;       /* BFMF orange — circle border & bolts */
+  --accent-warm:   #e86a00;       /* deeper orange for pressed/active states */
+  --accent-bg:     #1a0d00;       /* dark orange-black tint */
+  --accent-border: #f5820a;
+  --shadow:        0 4px 20px rgba(245, 130, 10, 0.45);
+  --border:        #2a2a2a;
+  --text-h:        #f5f5f5;
+  --social-bg:     #1c1c1c;
+  --yellow:        #f5c518;       /* "MORNING" yellow */
+  --yellow-text:   #1a1000;
+  --glow:          0 0 18px rgba(245, 130, 10, 0.4);
+}
+
+/* ─── Counter ───────────────────────────────────── */
 .counter {
   font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: 4px;
   color: var(--accent);
   background: var(--accent-bg);
   border: 2px solid transparent;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s, background 0.2s;
   margin-bottom: 24px;
 
   &:hover {
     border-color: var(--accent-border);
+    background: #2a1400;
   }
   &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
   }
 }
 
+/* ─── Hero ──────────────────────────────────────── */
 .hero {
   position: relative;
 
@@ -31,6 +58,7 @@
     width: 170px;
     position: relative;
     z-index: 0;
+    filter: drop-shadow(0 0 14px rgba(245, 130, 10, 0.6));
   }
 
   .framework,
@@ -56,6 +84,7 @@
   }
 }
 
+/* ─── Center Layout ─────────────────────────────── */
 #center {
   display: flex;
   flex-direction: column;
@@ -63,6 +92,7 @@
   place-content: center;
   place-items: center;
   flex-grow: 1;
+  background: #111;
 
   @media (max-width: 1024px) {
     padding: 32px 20px 24px;
@@ -70,14 +100,17 @@
   }
 }
 
+/* ─── Next Steps ────────────────────────────────── */
 #next-steps {
   display: flex;
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
   text-align: left;
+  background: #0d0d0d;
 
   & > div {
     flex: 1 1 0;
     padding: 32px;
+
     @media (max-width: 1024px) {
       padding: 24px 20px;
     }
@@ -87,6 +120,7 @@
     margin-bottom: 16px;
     width: 22px;
     height: 22px;
+    color: var(--accent);
   }
 
   @media (max-width: 1024px) {
@@ -95,6 +129,7 @@
   }
 }
 
+/* ─── Docs Panel ────────────────────────────────── */
 #docs {
   border-right: 1px solid var(--border);
 
@@ -104,6 +139,7 @@
   }
 }
 
+/* ─── Next Steps List / Social Links ────────────── */
 #next-steps ul {
   list-style: none;
   padding: 0;
@@ -117,19 +153,25 @@
 
   a {
     color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
     background: var(--social-bg);
+    border: 1px solid #2e2e2e;
     display: flex;
     padding: 6px 12px;
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    transition: box-shadow 0.3s;
+    transition: box-shadow 0.2s, border-color 0.2s;
 
     &:hover {
       box-shadow: var(--shadow);
+      border-color: var(--accent);
     }
+
     .button-icon {
       height: 18px;
       width: 18px;
@@ -153,14 +195,17 @@
   }
 }
 
+/* ─── Spacer ────────────────────────────────────── */
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
+
   @media (max-width: 1024px) {
     height: 48px;
   }
 }
 
+/* ─── Ticks ─────────────────────────────────────── */
 .ticks {
   position: relative;
   width: 100%;
@@ -175,10 +220,30 @@
 
   &::before {
     left: 0;
-    border-left-color: var(--border);
+    border-left-color: var(--accent);
   }
   &::after {
     right: 0;
-    border-right-color: var(--border);
+    border-right-color: var(--accent);
   }
+}
+
+/* ─── BFMF Badge (utility class) ─────────────────── */
+/* Yellow = "MORNING" energy, use for highlights/tags  */
+.bfmf-badge {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--yellow-text);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+/* Orange = primary CTA energy */
+.bfmf-badge--orange {
+  background: var(--accent);
+  color: #fff;
 }

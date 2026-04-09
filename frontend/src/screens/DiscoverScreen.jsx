@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import BottomNav from '../components/BottomNav';
+import { getMockDiscoverCandidates } from '../utils/mockData';
 
 const DiscoverScreen = () => {
   const [candidates, setCandidates] = useState([]);
@@ -29,11 +30,8 @@ const DiscoverScreen = () => {
         setCandidates(data.candidates);
       } else {
         // Mock data for testing
-        setCandidates([
-          { id: '1', user_id: 'user1', user_name: 'sarah_k', answer_text: "Only if she paints it like a Klondike wrapper first.", cmi_score: 92, morning_face_url: null },
-          { id: '2', user_id: 'user2', user_name: 'mike_j', answer_text: "Which toe? Pinky? Maybe. Big toe? Hard pass.", cmi_score: 78, morning_face_url: null },
-          { id: '3', user_id: 'user3', user_name: 'alex_t', answer_text: "I'd negotiate. Klondike AND a photo with JLC.", cmi_score: 94, morning_face_url: null },
-        ]);
+       // Replace the existing mock data with:
+setCandidates(getMockDiscoverCandidates());
       }
     } catch (error) {
       console.error('Error fetching candidates:', error);
