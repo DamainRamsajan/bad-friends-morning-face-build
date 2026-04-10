@@ -24,7 +24,7 @@ const LandingScreen = () => {
         <div className="flex justify-center mb-16">
           <Link
             to="/register"
-            className="bf-btn-primary inline-block"
+            className="bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold py-3 px-8 rounded-xl transition inline-block shadow-lg"
           >
             Try BF Morning Face 🍜
           </Link>
@@ -62,38 +62,30 @@ const LandingScreen = () => {
         </div>
         
         {/* How It Works */}
-        <h2 className="text-2xl font-bold text-center text-white mb-8">
-          How It Works
-        </h2>
+        <h2 className="text-2xl font-bold text-center text-white mb-8">How It Works</h2>
         
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-bf-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📸</span>
-            </div>
-            <h3 className="text-white font-semibold mb-2">1. Morning Face</h3>
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
+          <div className="bf-card text-center">
+            <div className="text-4xl mb-3">📸</div>
+            <h3 className="text-white font-bold mb-2">1. Morning Face</h3>
             <p className="text-gray-400 text-sm">Take one photo per day. No makeup. No filters. Just you.</p>
           </div>
           
-          <div className="text-center">
-            <div className="w-16 h-16 bg-bf-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🍜</span>
-            </div>
-            <h3 className="text-white font-semibold mb-2">2. Bad Questions</h3>
+          <div className="bf-card text-center">
+            <div className="text-4xl mb-3">🍜</div>
+            <h3 className="text-white font-bold mb-2">2. Bad Questions</h3>
             <p className="text-gray-400 text-sm">Answer absurd daily questions. Show off your humor.</p>
           </div>
           
-          <div className="text-center">
-            <div className="w-16 h-16 bg-bf-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">💀</span>
-            </div>
-            <h3 className="text-white font-semibold mb-2">3. Real Connections</h3>
+          <div className="bf-card text-center">
+            <div className="text-4xl mb-3">💀</div>
+            <h3 className="text-white font-bold mb-2">3. Real Connections</h3>
             <p className="text-gray-400 text-sm">Find your Bad Friend. Or your Worst Friend. Your call.</p>
           </div>
         </div>
         
         {/* Safety Section */}
-        <div className="bf-card bg-gradient-to-r from-bf-orange/10 to-transparent border-bf-orange/30 mb-8">
+        <div className="bf-card bg-gradient-to-r from-orange-500/10 to-transparent border-orange-500/30 mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">🛡️</span>
             <h3 className="text-white font-bold">Safety First</h3>
@@ -110,15 +102,15 @@ const LandingScreen = () => {
         </div>
         
         {/* Footer */}
-        <div className="text-center pt-8 border-t border-bf-border">
+        <div className="text-center pt-8 border-t border-gray-700">
           <p className="text-gray-500 text-sm mb-4">
             Built by fans, for fans of the Bad Friends podcast.
           </p>
           <div className="flex justify-center gap-6 text-sm text-gray-500">
-            <Link to="/features" className="hover:text-bf-orange transition">Features</Link>
-            <Link to="/investors" className="hover:text-bf-orange transition">Investors</Link>
-            <a href="#" className="hover:text-bf-orange transition">Privacy</a>
-            <a href="#" className="hover:text-bf-orange transition">Terms</a>
+            <Link to="/features" className="hover:text-orange-500 transition">Features</Link>
+            <Link to="/investors" className="hover:text-orange-500 transition">Investors</Link>
+            <a href="#" className="hover:text-orange-500 transition">Privacy</a>
+            <a href="#" className="hover:text-orange-500 transition">Terms</a>
           </div>
         </div>
         

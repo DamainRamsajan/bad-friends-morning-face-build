@@ -141,7 +141,7 @@ const HomeScreen = () => {
         <div className="bf-card mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="bf-header-sm">🌅 Good Morning, {userName}!</h2>
+              <h2 className="bf-header-sm text-white">🌅 Good Morning, {userName}!</h2>
               <p className="bf-text-dim text-xs mt-1">Streak: 🔥 {streak} days</p>
             </div>
             <MorningFaceThumbnail 
