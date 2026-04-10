@@ -106,3 +106,124 @@ body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
+/* ============================================
+   BF MORNING FACE - BUTTON STYLES
+   ============================================ */
+
+.btn-primary {
+  background: linear-gradient(135deg, #f5820a 0%, #f5c518 100%);
+  color: #1a1000;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 24px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 15px rgba(245, 130, 10, 0.4);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(245, 130, 10, 0.6);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid #f5820a;
+  color: #f5820a;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(245, 130, 10, 0.1);
+  transform: scale(1.02);
+}
+
+.btn-secondary:active {
+  transform: scale(0.96);
+}
+
+.btn-reaction {
+  background: #1a1f2e;
+  border: 1px solid #2d3a5f;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-reaction:active {
+  transform: scale(0.92);
+  background: rgba(245, 130, 10, 0.2);
+  border-color: #f5820a;
+}
+
+.btn-reaction-bobo:hover { background: rgba(245, 155, 11, 0.2); border-color: #f59e0b; }
+.btn-reaction-cheeto:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+.btn-reaction-tiger:hover { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+.btn-reaction-dead:hover { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; }
+
+.btn-like {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: white;
+  font-weight: 800;
+  padding: 14px 24px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-like:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+.btn-like:active {
+  transform: scale(0.96);
+}
+
+.btn-tab {
+  background: #1a1f2e;
+  color: #9ca3af;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-tab.active {
+  background: linear-gradient(135deg, #f5820a, #f5c518);
+  color: #1a1000;
+  box-shadow: 0 2px 10px rgba(245, 130, 10, 0.3);
+}
+
+.nav-item {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-item.active {
+  color: #f5820a;
+  transform: translateY(-4px);
+  text-shadow: 0 0 8px rgba(245, 130, 10, 0.5);
+}

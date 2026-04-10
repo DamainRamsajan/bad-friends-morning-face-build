@@ -1,4 +1,4 @@
-// frontend/src/App.jsx - CORRECTED VERSION (No broken import)
+// frontend/src/App.jsx - v1.0.0 Release
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth, AuthProvider } from './contexts/AuthContext'
@@ -33,9 +33,6 @@ const LoadingScreen = () => (
   </div>
 )
 
-// HomeScreen Component (inline since it was never extracted) Until it was extracted
-
-
 function AppContent() {
   const { user, loading } = useAuth()
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
@@ -46,44 +43,44 @@ function AppContent() {
   
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-  if (!user) {
-    setCheckingOnboarding(false)
-    return
-  }
-  
-  // First check localStorage for fast response
-  const localFlag = localStorage.getItem('bf_onboarding_complete');
-  if (localFlag === 'true') {
-    console.log('Using localStorage flag - onboarding complete');
-    setHasCompletedOnboarding(true);
-    setCheckingOnboarding(false);
-    return;
-  }
-  
-  // Fallback to API check
-  try {
-    const token = (await supabase.auth.getSession()).data.session?.access_token
-    const response = await fetch(`${API_URL}/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    const data = await response.json()
-    
-    console.log('API check - onboarding_complete:', data.profile?.onboarding_complete)
-    
-    if (data.success && data.profile) {
-      const onboardingComplete = data.profile.onboarding_complete === true
-      if (onboardingComplete) {
-        localStorage.setItem('bf_onboarding_complete', 'true');
+      if (!user) {
+        setCheckingOnboarding(false)
+        return
       }
-      setHasCompletedOnboarding(onboardingComplete)
-      setUserGender(data.profile.gender)
+      
+      // First check localStorage for fast response
+      const localFlag = localStorage.getItem('bf_onboarding_complete');
+      if (localFlag === 'true') {
+        console.log('Using localStorage flag - onboarding complete');
+        setHasCompletedOnboarding(true);
+        setCheckingOnboarding(false);
+        return;
+      }
+      
+      // Fallback to API check
+      try {
+        const token = (await supabase.auth.getSession()).data.session?.access_token
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const data = await response.json()
+        
+        console.log('API check - onboarding_complete:', data.profile?.onboarding_complete)
+        
+        if (data.success && data.profile) {
+          const onboardingComplete = data.profile.onboarding_complete === true
+          if (onboardingComplete) {
+            localStorage.setItem('bf_onboarding_complete', 'true');
+          }
+          setHasCompletedOnboarding(onboardingComplete)
+          setUserGender(data.profile.gender)
+        }
+      } catch (error) {
+        console.error('Error checking onboarding:', error)
+      } finally {
+        setCheckingOnboarding(false)
+      }
     }
-  } catch (error) {
-    console.error('Error checking onboarding:', error)
-  } finally {
-    setCheckingOnboarding(false)
-  }
-}
     
     checkOnboardingStatus()
   }, [user])
@@ -106,12 +103,12 @@ function AppContent() {
       {/* Onboarding */}
       <Route path="/onboarding" element={user ? <OnboardingScreen /> : <Navigate to="/login" />} />
       
-      {/* App Routes */}
+      {/* App Routes - No onboarding check needed (localStorage handles it) */}
       <Route path="/app" element={user ? <HomeScreen /> : <Navigate to="/login" />} />
-      <Route path="/app/feed" element={user && hasCompletedOnboarding ? <HomeScreen /> : <Navigate to="/onboarding" />} />
-      <Route path="/app/discover" element={user && hasCompletedOnboarding ? <DiscoverScreen /> : <Navigate to="/onboarding" />} />
-      <Route path="/app/matches" element={user && hasCompletedOnboarding ? <MatchesScreen /> : <Navigate to="/onboarding" />} />
-      <Route path="/app/profile" element={user && hasCompletedOnboarding ? <ProfileScreen /> : <Navigate to="/onboarding" />} />
+      <Route path="/app/feed" element={user ? <HomeScreen /> : <Navigate to="/login" />} />
+      <Route path="/app/discover" element={user ? <DiscoverScreen /> : <Navigate to="/login" />} />
+      <Route path="/app/matches" element={user ? <MatchesScreen /> : <Navigate to="/login" />} />
+      <Route path="/app/profile" element={user ? <ProfileScreen /> : <Navigate to="/login" />} />
       
       {/* Sisterhood - Women Only */}
       <Route 
