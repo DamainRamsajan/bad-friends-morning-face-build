@@ -24,7 +24,7 @@ const LandingScreen = () => {
         <div className="flex justify-center mb-16">
           <Link
             to="/register"
-            className="bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold py-3 px-8 rounded-xl transition inline-block shadow-lg"
+            className="bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white font-bold py-3 px-8 rounded-xl transition inline-block shadow-lg border border-[#1e3a5f]"
           >
             Try BF Morning Face 🍜
           </Link>
