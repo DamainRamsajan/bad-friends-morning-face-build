@@ -147,7 +147,7 @@ setCandidates(getMockDiscoverCandidates());
           </div>
           <div className="w-full bg-gray-800 rounded-full h-2">
             <div 
-              className="bg-red-500 h-2 rounded-full transition-all duration-300" 
+              className="bg-[#f5820a] h-2 rounded-full transition-all duration-300" 
               style={{ width: `${progressToUnlock}%` }}
             ></div>
           </div>
@@ -193,13 +193,13 @@ setCandidates(getMockDiscoverCandidates());
             <div className="flex gap-3">
               <button
                 onClick={() => rateAnswer(currentCandidate.id, true)}
-                className="flex-1 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition"
+                className="flex-1 btn-primary"
               >
                 💀 Worst Friend
               </button>
               <button
                 onClick={() => rateAnswer(currentCandidate.id, false)}
-                className="flex-1 py-3 bg-gray-700 text-white font-semibold rounded-xl hover:bg-gray-600 transition"
+                className="flex-1 btn-secondary"
               >
                 Skip
               </button>
@@ -209,7 +209,7 @@ setCandidates(getMockDiscoverCandidates());
             {facesUnlocked && (
               <button
                 onClick={() => likeUser(currentCandidate.user_id)}
-                className="w-full mt-3 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:opacity-90 transition"
+                className="w-full mt-3 btn-like"
               >
                 ❤️ Like
               </button>
