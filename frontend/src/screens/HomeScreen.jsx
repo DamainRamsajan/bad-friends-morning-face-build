@@ -126,10 +126,6 @@ const HomeScreen = () => {
     <div className="min-h-screen bg-badfriends-bg pb-20">
       <div className="max-w-md mx-auto p-4">
         
-        {/* Header */}
-        
-        
-        
         {/* Banner Image */}
         <img 
           src="/BFMF_Banner..png" 
@@ -151,34 +147,34 @@ const HomeScreen = () => {
           </div>
         </div>
         
-        {/* Motivational Message - Based on Actual CMI */}
+        {/* Motivational Message */}
         <div className="bf-card mb-4 bg-primary/5 border-primary/30">
           <p className="text-primary text-sm font-semibold text-center">
             {motivationalMessage}
           </p>
         </div>
         
-        {/* Feed Tabs */}
+        {/* Feed Tabs - Image Buttons for Faces and Answers */}
         <div className="flex gap-2 mb-4">
           <button
             onClick={() => setActiveTab('faces')}
-            className={`flex-1 py-2 rounded-xl text-sm font-semibold uppercase tracking-wide transition ${
-              activeTab === 'faces' 
-                ? 'bg-primary text-white' 
-                : 'bg-badfriends-card text-badfriends-text-muted'
-            }`}
+            className="flex-1"
           >
-            🌅 Morning Faces
+            <img 
+              src="/buttons/MorningFaces_Button.png" 
+              alt="Morning Faces"
+              className={`h-12 w-full object-contain transition-all ${activeTab === 'faces' ? 'opacity-100 scale-105' : 'opacity-60'}`}
+            />
           </button>
           <button
             onClick={() => setActiveTab('answers')}
-            className={`flex-1 py-2 rounded-xl text-sm font-semibold uppercase tracking-wide transition ${
-              activeTab === 'answers' 
-                ? 'bg-primary text-white' 
-                : 'bg-badfriends-card text-badfriends-text-muted'
-            }`}
+            className="flex-1"
           >
-            🍜 Answers
+            <img 
+              src="/buttons/RealAnws_Button.png" 
+              alt="Answers"
+              className={`h-12 w-full object-contain transition-all ${activeTab === 'answers' ? 'opacity-100 scale-105' : 'opacity-60'}`}
+            />
           </button>
           <button
             onClick={() => setActiveTab('popular')}

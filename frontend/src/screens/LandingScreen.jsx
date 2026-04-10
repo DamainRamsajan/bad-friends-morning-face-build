@@ -26,7 +26,7 @@ const LandingScreen = () => {
             <img 
               src="/buttons/Try_BFMF_Button.png" 
               alt="Try BF Morning Face"
-              className="h-11 w-auto mx-auto hover:scale-105 transition-transform"
+              className="h-14 w-auto mx-auto hover:scale-105 transition-transform"
             />
           </Link>
         </div>
