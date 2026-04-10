@@ -22,11 +22,12 @@ const LandingScreen = () => {
         
         {/* CTA Button */}
         <div className="flex justify-center mb-16">
-          <Link
-            to="/register"
-            className="bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white font-bold py-3 px-8 rounded-xl transition inline-block shadow-lg border border-[#1e3a5f]"
-          >
-            Try BF Morning Face 🍜
+          <Link to="/register">
+            <img 
+              src="/buttons/Try_BFMF_Button.png" 
+              alt="Try BF Morning Face"
+              className="h-11 w-auto mx-auto hover:scale-105 transition-transform"
+            />
           </Link>
         </div>
         
