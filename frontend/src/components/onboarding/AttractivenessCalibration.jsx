@@ -38,7 +38,7 @@ const AttractivenessCalibration = ({ onComplete, onProgress }) => {
   };
   
   return (
-    <div className="min-h-screen bg-[#0a0e1a] p-4">
+    <div className="min-h-screen bg-[#0a0e1a] p-4 rounded-2xl">
       <div className="max-w-md mx-auto">
         <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-500 mb-1">

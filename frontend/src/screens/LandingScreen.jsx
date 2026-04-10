@@ -16,27 +16,27 @@ const LandingScreen = () => {
         </div>
         
         {/* Tagline */}
-        <p className="text-center text-white/80 text-lg mb-8">
+        <p className="text-center text-[#1a1f2e] text-lg mb-8 font-semibold">
           Morning faces. Bad jokes. Real matches.
         </p>
         
         {/* CTA Button */}
-        <div className="flex justify-center mb-16">
+        <div className="flex justify-center mb-8">
           <Link to="/register">
             <img 
               src="/buttons/Try_BFMF_Button.png" 
               alt="Try BF Morning Face"
-              className="h-14 w-auto mx-auto hover:scale-105 transition-transform"
+              className="h-32 w-auto mx-auto hover:scale-105 transition-transform"
             />
           </Link>
         </div>
         
         {/* Differentiators Section */}
-        <h2 className="text-2xl font-bold text-center text-white mb-8">
+        <h2 className="text-2xl font-bold text-center text-[#1a1f2e] mb-8">
           What Makes BF Morning Face Different
         </h2>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bf-card text-center">
             <div className="text-4xl mb-3">🌅</div>
             <h3 className="text-white font-bold mb-2">Morning Face Required</h3>
@@ -63,9 +63,9 @@ const LandingScreen = () => {
         </div>
         
         {/* How It Works */}
-        <h2 className="text-2xl font-bold text-center text-white mb-8">How It Works</h2>
+        <h2 className="text-2xl font-bold text-center text-[#1a1f2e] mb-8">How It Works</h2>
         
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bf-card text-center">
             <div className="text-4xl mb-3">📸</div>
             <h3 className="text-white font-bold mb-2">1. Morning Face</h3>
@@ -86,7 +86,7 @@ const LandingScreen = () => {
         </div>
         
         {/* Safety Section */}
-        <div className="bf-card bg-gradient-to-r from-orange-500/10 to-transparent border-orange-500/30 mb-8">
+        <div className="bf-card border-orange-500/30 mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">🛡️</span>
             <h3 className="text-white font-bold">Safety First</h3>

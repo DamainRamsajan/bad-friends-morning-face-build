@@ -105,22 +105,24 @@ const OnboardingScreen = () => {
     }
   };
   
+  // UPDATED FEATURES LIST - More detailed
   const featuresList = [
-    { icon: "🌅", text: "Morning Face Streak" },
-    { icon: "🎭", text: "Humor-First Matching" },
-    { icon: "👥", text: "4 Friendship Layers" },
-    { icon: "🍜", text: "Daily Bad Questions" },
-    { icon: "💀", text: "Worst Friend Reactions" },
-    { icon: "🤖", text: "AI-Powered Matching (v1.1)" },
+    { icon: "🌅", text: "Daily Morning Face Streak - Earn trust points" },
+    { icon: "🎭", text: "Answers-First Discovery - Personality before photos" },
+    { icon: "👥", text: "Four Friendship Layers - Friends → Bad → Worst → Matches" },
+    { icon: "💀", text: "Worst Friend Reactions - Community gold standard" },
+    { icon: "👭", text: "The Sisterhood - Women-only safety network" },
+    { icon: "📈", text: "Graduated Trust Levels - Earn features through behavior" },
   ];
   
+  // UPDATED SAFETY LIST - Architecture focused
   const safetyList = [
-    { icon: "👭", text: "The Sisterhood - Women-only vetting" },
-    { icon: "📈", text: "Graduated Trust Levels" },
-    { icon: "🛡️", text: "Bad Friend Backup" },
-    { icon: "🚨", text: "Emergency Kill Switch" },
-    { icon: "🔒", text: "End-to-End Encryption" },
-    { icon: "👁️", text: "No Screenshots Allowed" },
+    { icon: "🛡️", text: "Women-First Safety Design" },
+    { icon: "🔒", text: "End-to-End Encryption for Messages" },
+    { icon: "📞", text: "Bad Friend Backup - Share date with trusted contact" },
+    { icon: "🚨", text: "Emergency Kill Switch - One-tap lockdown" },
+    { icon: "🚫", text: "No Screenshots in Sisterhood" },
+    { icon: "📍", text: "Graduated Location Sharing - Level 4+ only" },
   ];
   
   if (loading) {
@@ -146,65 +148,67 @@ const OnboardingScreen = () => {
         {/* Three-Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           
-          {/* Left Column - Features */}
-          <div className="bf-card h-fit">
+          {/* Left Column - Features (UPDATED TITLE) */}
+          <div className="bf-card h-fit rounded-2xl">
             <h3 className="text-white font-bold mb-3 flex items-center gap-2">
-              <span>⚡</span> What You Get
+              <span>⚡</span> BF Morning Face Features
             </h3>
             <div className="space-y-2">
               {featuresList.map((feature, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-                  <span>{feature.icon}</span>
+                  <span className="text-base">{feature.icon}</span>
                   <span>{feature.text}</span>
                 </div>
               ))}
             </div>
           </div>
           
-          {/* Center Column - Questions */}
-          <div className="md:col-span-2">
-            {step === 1 && (
-              <PsychologicalScales 
-                onComplete={savePsychologicalData}
-                onProgress={setProgress}
-              />
-            )}
-            {step === 2 && (
-              <BaselineCMI 
-                onComplete={saveBaselineCMI}
-                onProgress={setProgress}
-                apiUrl={API_URL}
-                getToken={getToken}
-              />
-            )}
-            {step === 3 && (
-              <AttractivenessCalibration 
-                onComplete={saveCalibration}
-                onProgress={setProgress}
-              />
-            )}
-            {step === 4 && (
-              <Dealbreakers 
-                onComplete={saveDealbreakers}
-              />
-            )}
+          {/* Center Column - Questions (ADDED ROUNDED CORNERS) */}
+          <div className="md:col-span-2 rounded-2xl">
+            <div className="rounded-2xl">
+              {step === 1 && (
+                <PsychologicalScales 
+                  onComplete={savePsychologicalData}
+                  onProgress={setProgress}
+                />
+              )}
+              {step === 2 && (
+                <BaselineCMI 
+                  onComplete={saveBaselineCMI}
+                  onProgress={setProgress}
+                  apiUrl={API_URL}
+                  getToken={getToken}
+                />
+              )}
+              {step === 3 && (
+                <AttractivenessCalibration 
+                  onComplete={saveCalibration}
+                  onProgress={setProgress}
+                />
+              )}
+              {step === 4 && (
+                <Dealbreakers 
+                  onComplete={saveDealbreakers}
+                />
+              )}
+            </div>
           </div>
           
-          {/* Right Column - Safety & Trust */}
-          <div className="bf-card h-fit">
+          {/* Right Column - Trusted Architecture (UPDATED TITLE) */}
+          <div className="bf-card h-fit rounded-2xl">
             <h3 className="text-white font-bold mb-3 flex items-center gap-2">
-              <span>🛡️</span> Trust & Safety
+              <span>🛡️</span> Trusted Architecture
             </h3>
             <div className="space-y-2">
               {safetyList.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-                  <span>{item.icon}</span>
+                  <span className="text-base">{item.icon}</span>
                   <span>{item.text}</span>
                 </div>
               ))}
             </div>
             <div className="mt-4 pt-3 border-t border-bf-border">
-              <div className="bf-badge bf-badge-orange text-xs text-center">
+              <div className="bg-[#1a1f2e] text-white border border-orange-500 px-2 py-1 rounded-full text-xs text-center font-semibold inline-block w-full">
                 Women-First Safety
               </div>
             </div>

@@ -23,7 +23,7 @@ const Dealbreakers = ({ onComplete }) => {
   const isValid = wantsKids !== null && politics !== null;
   
   return (
-    <div className="min-h-screen bg-[#0a0e1a] p-4">
+    <div className="min-h-screen bg-[#0a0e1a] p-4 rounded-2xl">
       <div className="max-w-md mx-auto">
         <h2 className="text-2xl font-bold text-white text-center mb-2">Dealbreakers</h2>
         <p className="text-gray-400 text-center text-sm mb-6">Be honest. We won't judge.</p>
