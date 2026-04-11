@@ -308,6 +308,18 @@ async def save_dealbreakers(
     return {"success": True, "onboarding_complete": True}
 
 # =====================================================
+# SYSTEM INFO ENDPOINTS
+# =====================================================
+
+@app.get("/users/count")
+async def get_user_count(current_user: dict = Depends(get_current_user)):
+    """Get total number of registered users in the system.
+    Used by frontend to determine whether to show mock data.
+    Mock data hides automatically when system reaches 20+ real users."""
+    result = supabase.table("users").select("id", count="exact").execute()
+    return {"success": True, "count": result.count}
+
+# =====================================================
 # EXISTING ENDPOINTS (unchanged)
 # =====================================================
 
