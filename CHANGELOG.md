@@ -7,3 +7,4 @@
 ## [2026-04-10 17:18] [9655614] feat(v1.1.0): Replace text buttons with custom images
 ## [2026-04-10 17:28] [26d4b06] feat(v1.0.1): Replace text buttons with custom images
 ## [2026-04-10 19:25] [af3f99d] fix(onboarding): Add rounded corners to all onboarding component containers
+## [2026-04-10 19:57] [72dad04] style(landing): Double CTA button size to h-64
