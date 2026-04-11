@@ -120,11 +120,25 @@ const HomeScreen = () => {
     fetchProfile();
   };
   
+  // Streak display logic - NEVER shows "0 days" (Task 8)
+  const getStreakDisplay = () => {
+    if (streak === 0) {
+      return { text: "Start your streak today", subtext: "Upload your morning face to begin", className: "streak-zero" };
+    } else if (streak < 7) {
+      return { text: `${streak} day streak`, subtext: "Keep it going — don't break the chain", className: "streak-active" };
+    } else if (streak < 30) {
+      return { text: `${streak} day streak 🔥`, subtext: "Bobby would be proud. Allegedly.", className: "streak-hot" };
+    } else {
+      return { text: `${streak} day streak 💀`, subtext: "Worst Friend energy. Certified.", className: "streak-legendary" };
+    }
+  };
+  
+  const streakDisplay = getStreakDisplay();
   const motivationalMessage = getMotivationalMessage(cmiScore);
   
   return (
-    <div className="min-h-screen bg-badfriends-bg pb-20">
-      <div className="max-w-md mx-auto p-4">
+    <div className="home-scroll-container">
+      <div className="max-w-md mx-auto">
         
         {/* Banner Image */}
         <img 
@@ -133,59 +147,65 @@ const HomeScreen = () => {
           className="w-full rounded-2xl mb-4"
         />
         
-        {/* Morning Face Section - Compact */}
-        <div className="bf-card mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="bf-header-sm text-white">🌅 Good Morning, {userName}!</h2>
-              <p className="bf-text-dim text-xs mt-1">Streak: 🔥 {streak} days</p>
+        {/* SECTION: Daily Actions Label */}
+        <div className="home-section-label">⚡ DAILY ACTIONS</div>
+        
+        {/* Morning Face Section - Redesigned (Task 2) */}
+        <div className="morning-face-card">
+          <div className="morning-face-info">
+            <div className="morning-face-title">TODAY'S MORNING FACE</div>
+            <div className="morning-face-subtitle">No filters. No retakes. Just you.</div>
+            <div className={`morning-face-streak ${streakDisplay.className}`}>
+              {streakDisplay.text}
             </div>
-            <MorningFaceThumbnail 
-              streak={streak}
-              onUploadComplete={handleUploadComplete}
-            />
+            <div className="morning-face-urgency">⏰ Today's window closes at midnight</div>
           </div>
+          <MorningFaceThumbnail 
+            streak={streak}
+            onUploadComplete={handleUploadComplete}
+          />
         </div>
         
-        {/* Motivational Message */}
-        <div className="bf-card mb-4 bg-primary/5 border-primary/30">
-          <p className="text-primary text-sm font-semibold text-center">
-            {motivationalMessage}
-          </p>
+        {/* Motivational / Humor Rank Banner (Task 3 - partial) */}
+        <div className="humor-rank-banner">
+          <div className="humor-rank-icon">💀</div>
+          <div className="humor-rank-content">
+            <div className="humor-rank-label">HUMOR RANK</div>
+            <div className="humor-rank-title">TOP {100 - cmiScore}% — WORST FRIEND MATERIAL</div>
+            <div className="humor-rank-sub">{motivationalMessage}</div>
+          </div>
+          <div className="humor-rank-badge">CERTIFIED 💀</div>
         </div>
         
-        {/* Feed Tabs - Image Buttons for Faces and Answers */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setActiveTab('faces')}
-            className="flex-1"
-          >
-            <img 
-              src="/buttons/MorningFaces_Button.png" 
-              alt="Morning Faces"
-              className={`h-12 w-full object-contain transition-all ${activeTab === 'faces' ? 'opacity-100 scale-105' : 'opacity-60'}`}
-            />
-          </button>
-          <button
-            onClick={() => setActiveTab('answers')}
-            className="flex-1"
-          >
-            <img 
-              src="/buttons/RealAnws_Button.png" 
-              alt="Answers"
-              className={`h-12 w-full object-contain transition-all ${activeTab === 'answers' ? 'opacity-100 scale-105' : 'opacity-60'}`}
-            />
-          </button>
-          <button
-            onClick={() => setActiveTab('popular')}
-            className={`flex-1 py-2 rounded-xl text-sm font-semibold uppercase tracking-wide transition ${
-              activeTab === 'popular' 
-                ? 'bg-primary text-white' 
-                : 'bg-badfriends-card text-badfriends-text-muted'
-            }`}
-          >
-            🔥 Popular
-          </button>
+        {/* Section Divider */}
+        <div className="home-section-divider"></div>
+        
+        {/* SECTION: Feed Label */}
+        <div className="home-section-label">📰 THE FEED</div>
+        
+        {/* Feed Tabs - Remove broken images (Task 4) */}
+        <div className="feed-header">
+          <div className="feed-title">Morning Faces</div>
+          <div className="feed-filters">
+            <button
+              onClick={() => setActiveTab('faces')}
+              className={`feed-filter-btn ${activeTab === 'faces' ? 'active' : ''}`}
+            >
+              Faces
+            </button>
+            <button
+              onClick={() => setActiveTab('answers')}
+              className={`feed-filter-btn ${activeTab === 'answers' ? 'active' : ''}`}
+            >
+              Answers
+            </button>
+            <button
+              onClick={() => setActiveTab('popular')}
+              className={`feed-filter-btn ${activeTab === 'popular' ? 'active' : ''}`}
+            >
+              🔥 Popular
+            </button>
+          </div>
         </div>
         
         {/* Feed Content */}
@@ -202,74 +222,84 @@ const HomeScreen = () => {
         ) : (
           <div className="space-y-4">
             {feedItems.map((item) => (
-              <div key={item.id} className="bf-card">
+              <div key={item.id} className="feed-card">
                 {/* User Info */}
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                    <span className="text-sm">👤</span>
+                <div className="feed-card-header">
+                  <div className="feed-card-avatar">
+                    <img 
+                      src={item.users?.avatar_url || `https://randomuser.me/api/portraits/thumb/men/${Math.floor(Math.random() * 50)}.jpg`} 
+                      alt="avatar"
+                      onError={(e) => e.target.src = 'https://randomuser.me/api/portraits/thumb/men/1.jpg'}
+                    />
                   </div>
                   <div>
-                    <p className="text-badfriends-text font-semibold text-sm">
+                    <div className="feed-card-user">
                       @{item.users?.name || item.user_id?.slice(0, 8) || 'Bad Friend'}
-                    </p>
-                    <p className="bf-text-dim text-xs">
+                    </div>
+                    <div className="feed-card-time">
                       {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
+                    </div>
                   </div>
                 </div>
                 
-                {/* Content */}
+                {/* Photo with hover overlay (Task 5) */}
                 {activeTab === 'faces' && item.image_url && (
-                  <img 
-                    src={item.image_url} 
-                    alt="Morning face"
-                    className="w-full rounded-xl mb-3"
-                  />
-                )}
-                {(activeTab === 'answers' || activeTab === 'popular') && item.answer_text && (
-                  <div className="bg-badfriends-bg rounded-xl p-3 mb-3">
-                    <p className="text-badfriends-text text-sm">"{item.answer_text}"</p>
-                    {item.cmi_score && (
-                      <p className="text-dead text-xs mt-2">💀 CMI: {item.cmi_score}%</p>
-                    )}
+                  <div className="feed-card-photo">
+                    <img src={item.image_url} alt="Morning face" />
+                    <div className="feed-card-react-overlay">
+                      <button 
+                        onClick={() => addReaction('morning_face', item.id, 'bobo')}
+                        className="react-btn"
+                      >
+                        🍜
+                      </button>
+                      <button 
+                        onClick={() => addReaction('morning_face', item.id, 'cheeto')}
+                        className="react-btn"
+                      >
+                        🔥
+                      </button>
+                      <button 
+                        onClick={() => addReaction('morning_face', item.id, 'tiger')}
+                        className="react-btn"
+                      >
+                        🐯
+                      </button>
+                      <button 
+                        onClick={() => addReaction('morning_face', item.id, 'dead')}
+                        className="react-btn"
+                      >
+                        💀
+                      </button>
+                    </div>
                   </div>
                 )}
                 
-                {/* Caption */}
-                {activeTab === 'faces' && item.caption && (
-                  <p className="bf-text-dim text-xs mb-2 italic">"{item.caption}"</p>
+                {/* Quote for answers */}
+                {(activeTab === 'answers' || activeTab === 'popular') && item.answer_text && (
+                  <div className="feed-card-quote">
+                    "{item.answer_text}"
+                  </div>
                 )}
                 
-                {/* Reactions */}
-                <div className="flex gap-4 pt-2">
-                  <button 
-                    onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'bobo')}
-                    className="bf-reaction bf-reaction-bobo"
-                  >
-                    <span className="text-lg">🍜</span>
-                    <span className="text-xs">{item.reaction_count_bobo || 0}</span>
-                  </button>
-                  <button 
-                    onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'cheeto')}
-                    className="bf-reaction bf-reaction-cheeto"
-                  >
-                    <span className="text-lg">🔥</span>
-                    <span className="text-xs">{item.reaction_count_cheeto || 0}</span>
-                  </button>
-                  <button 
-                    onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'tiger')}
-                    className="bf-reaction bf-reaction-tiger"
-                  >
-                    <span className="text-lg">🐯</span>
-                    <span className="text-xs">{item.reaction_count_tiger || 0}</span>
-                  </button>
-                  <button 
-                    onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'dead')}
-                    className="bf-reaction bf-reaction-dead"
-                  >
-                    <span className="text-lg">💀</span>
-                    <span className="text-xs">{item.reaction_count_dead || 0}</span>
-                  </button>
+                {/* Reaction counts - ALWAYS VISIBLE (Task 5) */}
+                <div className="feed-card-reactions">
+                  <div className="reaction-count" onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'bobo')}>
+                    <span className="reaction-emoji">🍜</span>
+                    <span className="reaction-num">{item.reaction_count_bobo || 0}</span>
+                  </div>
+                  <div className="reaction-count" onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'cheeto')}>
+                    <span className="reaction-emoji">🔥</span>
+                    <span className="reaction-num">{item.reaction_count_cheeto || 0}</span>
+                  </div>
+                  <div className="reaction-count" onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'tiger')}>
+                    <span className="reaction-emoji">🐯</span>
+                    <span className="reaction-num">{item.reaction_count_tiger || 0}</span>
+                  </div>
+                  <div className="reaction-count" onClick={() => addReaction(activeTab === 'faces' ? 'morning_face' : 'answer', item.id, 'dead')}>
+                    <span className="reaction-emoji">💀</span>
+                    <span className="reaction-num">{item.reaction_count_dead || 0}</span>
+                  </div>
                 </div>
               </div>
             ))}

@@ -1,249 +1,644 @@
-/*
-  Bad Friends Morning Face — App.css
-  Brand: BF Morning Face
-  Palette: Orange · Yellow · White · Black
-*/
+/* ============================================
+   HOMESCREEN STYLES - Added April 2026
+   ============================================ */
 
-/* ─── CSS Variables ─────────────────────────────── */
-:root {
-  --accent:        #f5820a;       /* BFMF orange — circle border & bolts */
-  --accent-warm:   #e86a00;       /* deeper orange for pressed/active states */
-  --accent-bg:     #1a0d00;       /* dark orange-black tint */
-  --accent-border: #f5820a;
-  --shadow:        0 4px 20px rgba(245, 130, 10, 0.45);
-  --border:        #2a2a2a;
-  --text-h:        #f5f5f5;
-  --social-bg:     #1c1c1c;
-  --yellow:        #f5c518;       /* "MORNING" yellow */
-  --yellow-text:   #1a1000;
-  --glow:          0 0 18px rgba(245, 130, 10, 0.4);
+/* Import Bangers font for TAP button */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+/* Scroll Container */
+.home-scroll-container {
+  padding-top: 0;
+  padding-bottom: 80px;
+  overflow-y: auto;
+  min-height: 100vh;
+  background: #0d0d0d;
 }
 
-/* ─── Counter ───────────────────────────────────── */
-.counter {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+/* Content Wrapper - Centered max-width */
+.home-content-wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Section Label */
+.home-section-label {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 11px;
+  color: #888888;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 8px 20px;
-  border-radius: 4px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.2s, background 0.2s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-    background: #2a1400;
-  }
-  &:focus-visible {
-    outline: 2px solid var(--yellow);
-    outline-offset: 3px;
-  }
+  padding: 0 20px 8px;
 }
 
-/* ─── Hero ──────────────────────────────────────── */
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-    filter: drop-shadow(0 0 14px rgba(245, 130, 10, 0.6));
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+/* Section Divider */
+.home-section-divider {
+  height: 1px;
+  background: rgba(245, 130, 10, 0.1);
+  margin: 8px 20px 16px;
 }
 
-/* ─── Center Layout ─────────────────────────────── */
-#center {
+/* ============================================
+   MORNING FACE ACTION CARD
+   ============================================ */
+
+.morning-face-card {
+  margin: 0 16px 16px;
+  background: #161616;
+  border: 1px solid rgba(245, 130, 10, 0.35);
+  border-top: 3px solid #f5820a;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: box-shadow 0.2s;
+}
+
+.morning-face-card:hover {
+  box-shadow: 0 4px 24px rgba(245, 130, 10, 0.3);
+}
+
+.morning-face-info {
+  flex: 1;
+}
+
+.morning-face-title {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 22px;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.morning-face-subtitle {
+  font-size: 13px;
+  color: #888888;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.morning-face-streak {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.morning-face-streak.streak-zero {
+  color: #f5820a;
+}
+
+.morning-face-streak.streak-active {
+  color: #f5c518;
+}
+
+.morning-face-streak.streak-hot {
+  color: #f5c518;
+}
+
+.morning-face-streak.streak-legendary {
+  color: #f5c518;
+}
+
+.morning-face-urgency {
+  font-size: 11px;
+  color: #666666;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   TAP CAMERA BUTTON - Illustrated Camera Version
+   BMFM brand - Yellow surface, ink outline, hard drop shadow
+   ============================================ */
+
+/* Button Container */
+.morning-face-cta {
+  /* Size - large and chunky */
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+
+  /* Shape - squarish sticker feel */
+  border-radius: 40px;
+
+  /* Yellow surface - BMFM brand */
+  background: #FFB800;
+
+  /* Ink outline */
+  border: 5px solid #0D0400;
+  
+  /* Orange inner outline ring */
+  outline: 3px solid #FF6600;
+  outline-offset: -10px;
+
+  /* Hard drop shadow + inner bevel + orange glow */
+  box-shadow:
+    8px 8px 0px #0D0400,
+    inset 0 6px 0 rgba(255, 255, 180, 0.6),
+    inset 0 -6px 0 rgba(80, 20, 0, 0.4),
+    /* Orange glow effects (preserved from previous) */
+    0 0 0 3px rgba(245, 130, 10, 0.2),
+    0 0 20px rgba(245, 130, 10, 0.6),
+    0 0 40px rgba(245, 130, 10, 0.3);
+
+  /* Layout */
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-  background: #111;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
+  /* Positioning for overlays */
+  position: relative;
+  overflow: visible;
+
+  /* Snappy transitions - no delay */
+  transition: transform 0.07s ease, box-shadow 0.07s ease;
+
+  /* Pulse animation on the glow only */
+  animation: cta-pulse 2.5s ease-in-out infinite;
+}
+
+/* Shimmer Overlay - white sheen at top-left */
+.morning-face-cta .shimmer {
+  position: absolute;
+  top: 12px;
+  left: 22px;
+  width: 56px;
+  height: 14px;
+  background: rgba(255, 255, 220, 0.7);
+  border-radius: 10px;
+  transform: rotate(-14deg);
+  pointer-events: none;
+}
+
+/* Camera Icon - illustrated BMFM style */
+.morning-face-cta .cta-icon {
+  width: 115px;
+  height: 90px;
+  position: relative;
+  z-index: 3;
+}
+
+/* TAP Label - Bangers font, dark ink on yellow */
+.morning-face-cta .cta-label {
+  font-family: 'Bangers', Impact, sans-serif;
+  font-size: 34px;
+  letter-spacing: 5px;
+  color: #0D0400;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  line-height: 1;
+  margin-top: 2px;
+  position: relative;
+  z-index: 3;
+}
+
+/* Hover State - lift effect */
+.morning-face-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow:
+    10px 10px 0px #0D0400,
+    inset 0 6px 0 rgba(255, 255, 180, 0.6),
+    inset 0 -6px 0 rgba(80, 20, 0, 0.4),
+    0 0 0 5px rgba(245, 130, 10, 0.2),
+    0 0 30px rgba(245, 130, 10, 0.8),
+    0 0 60px rgba(245, 130, 10, 0.4);
+  animation-play-state: paused;
+}
+
+/* Active / Pressed State - button sinks */
+.morning-face-cta:active {
+  transform: translate(7px, 7px);
+  box-shadow:
+    1px 1px 0px #0D0400,
+    inset 0 4px 0 rgba(255, 255, 180, 0.3),
+    inset 0 -4px 0 rgba(80, 20, 0, 0.3),
+    0 0 0 3px rgba(245, 130, 10, 0.3),
+    0 0 14px rgba(245, 130, 10, 0.6);
+}
+
+.morning-face-cta:active .shimmer {
+  opacity: 0.25;
+}
+
+/* Focus visible for keyboard navigation */
+.morning-face-cta:focus-visible {
+  outline: 3px solid #FFE000;
+  outline-offset: 4px;
+}
+
+/* Pulse Animation - breathing glow only */
+@keyframes cta-pulse {
+  0%, 100% {
+    box-shadow:
+      8px 8px 0px #0D0400,
+      inset 0 6px 0 rgba(255, 255, 180, 0.6),
+      inset 0 -6px 0 rgba(80, 20, 0, 0.4),
+      0 0 0 3px rgba(245, 130, 10, 0.2),
+      0 0 20px rgba(245, 130, 10, 0.6),
+      0 0 40px rgba(245, 130, 10, 0.3);
+  }
+  50% {
+    box-shadow:
+      8px 8px 0px #0D0400,
+      inset 0 6px 0 rgba(255, 255, 180, 0.6),
+      inset 0 -6px 0 rgba(80, 20, 0, 0.4),
+      0 0 0 6px rgba(245, 130, 10, 0.15),
+      0 0 30px rgba(245, 130, 10, 0.85),
+      0 0 60px rgba(245, 130, 10, 0.45);
   }
 }
 
-/* ─── Next Steps ────────────────────────────────── */
-#next-steps {
+/* ============================================
+   HUMOR RANK BANNER
+   ============================================ */
+
+.humor-rank-banner {
+  margin: 0 16px 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(245, 130, 10, 0.15) 0%,
+    rgba(245, 197, 24, 0.08) 100%
+  );
+  border: 1px solid rgba(245, 197, 24, 0.35);
+  border-left: 4px solid #f5c518;
+  border-radius: 10px;
+  padding: 16px 20px;
   display: flex;
-  border-top: 2px solid var(--accent);
-  text-align: left;
-  background: #0d0d0d;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-    color: var(--accent);
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  align-items: center;
+  gap: 14px;
 }
 
-/* ─── Docs Panel ────────────────────────────────── */
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.humor-rank-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
-/* ─── Next Steps List / Social Links ────────────── */
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.humor-rank-content {
+  flex: 1;
+}
+
+.humor-rank-label {
+  font-size: 11px;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+
+.humor-rank-title {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 20px;
+  color: #f5c518;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.humor-rank-sub {
+  font-size: 13px;
+  color: #888888;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.humor-rank-badge {
+  flex-shrink: 0;
+  background: #f5c518;
+  color: #1a1000;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ============================================
+   FEED HEADER
+   ============================================ */
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-top: 1px solid rgba(245, 130, 10, 0.15);
+}
+
+.feed-title {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 22px;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: #f5820a;
+  border-radius: 2px;
+}
+
+.feed-filters {
   display: flex;
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border-radius: 4px;
-    background: var(--social-bg);
-    border: 1px solid #2e2e2e;
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.2s, border-color 0.2s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-      border-color: var(--accent);
-    }
-
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
 }
 
-/* ─── Spacer ────────────────────────────────────── */
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-/* ─── Ticks ─────────────────────────────────────── */
-.ticks {
-  position: relative;
-  width: 100%;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
-
-  &::before {
-    left: 0;
-    border-left-color: var(--accent);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--accent);
-  }
-}
-
-/* ─── BFMF Badge (utility class) ─────────────────── */
-/* Yellow = "MORNING" energy, use for highlights/tags  */
-.bfmf-badge {
-  display: inline-block;
-  background: var(--yellow);
-  color: var(--yellow-text);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+.feed-filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid rgba(245, 130, 10, 0.3);
+  background: transparent;
+  color: #888888;
+  transition: all 0.2s;
 }
 
-/* Orange = primary CTA energy */
-.bfmf-badge--orange {
-  background: var(--accent);
-  color: #fff;
+.feed-filter-btn.active {
+  background: #f5820a;
+  color: #000000;
+  border-color: #f5820a;
+  font-weight: 700;
+}
+
+.feed-filter-btn:hover:not(.active) {
+  border-color: #f5820a;
+  color: #f5820a;
+}
+
+/* ============================================
+   FEED CARD - Complete Card Structure
+   ============================================ */
+
+.feed-card {
+  margin: 0 16px 16px;
+  background: #161616;
+  border: 1px solid rgba(245, 130, 10, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.feed-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Card Header */
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.feed-card-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(245, 130, 10, 0.35);
+  flex-shrink: 0;
+  background: #2a2a2a;
+}
+
+.feed-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feed-card-user {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.feed-card-time {
+  font-size: 12px;
+  color: #888888;
+  margin-top: 1px;
+}
+
+/* Photo Container */
+.feed-card-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  display: block;
+  position: relative;
+}
+
+.feed-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.feed-card:hover .feed-card-photo img {
+  transform: scale(1.02);
+}
+
+/* Quick React Overlay */
+.feed-card-react-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.feed-card:hover .feed-card-react-overlay {
+  opacity: 1;
+}
+
+.react-btn {
+  font-size: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.react-btn:hover {
+  background: rgba(245, 130, 10, 0.3);
+  transform: scale(1.15);
+}
+
+/* Quote Text */
+.feed-card-quote {
+  padding: 12px 16px 4px;
+  font-size: 14px;
+  font-style: italic;
+  color: #888888;
+  line-height: 1.5;
+}
+
+/* Reaction Counts Row - Horizontal Layout */
+.feed-card-reactions {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+.reaction-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #888888;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.reaction-count:hover {
+  color: #f5820a;
+}
+
+.reaction-count .reaction-emoji {
+  font-size: 16px;
+}
+
+.reaction-count .reaction-num {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ============================================
+   BOTTOM NAVIGATION - Fixed Gap Issue
+   ============================================ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: #0d0d0d;
+  border-top: 2px solid rgba(245, 130, 10, 0.4);
+  display: flex;
+  align-items: stretch;
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  padding-bottom: 4px;
+  position: relative;
+  transition: opacity 0.2s;
+  background: none;
+  border: none;
+}
+
+/* Active indicator bar at the top of the nav item */
+.bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: #f5820a;
+  border-radius: 0 0 2px 2px;
+}
+
+.bottom-nav-item .nav-icon {
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.15s;
+  filter: grayscale(0.3) opacity(0.6);
+}
+
+.bottom-nav-item .nav-label {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666666;
+  transition: color 0.2s;
+}
+
+/* Inactive hover state */
+.bottom-nav-item:hover .nav-icon {
+  transform: scale(1.1) translateY(-1px);
+  filter: grayscale(0) opacity(0.85);
+}
+
+.bottom-nav-item:hover .nav-label {
+  color: #999999;
+}
+
+/* Active state */
+.bottom-nav-item.active .nav-icon {
+  filter: none;
+  transform: scale(1.05) translateY(-1px);
+}
+
+.bottom-nav-item.active .nav-label {
+  color: #f5820a;
+  font-weight: 700;
+}
+
+/* Logo Container and Glow */
+.home-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px 16px;
+}
+
+.home-logo {
+  height: 200px;
+  width: auto;
+  filter: drop-shadow(0 0 20px rgba(245, 130, 10, 0.5));
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes logo-pulse {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(245, 130, 10, 0.5)); }
+  50% { filter: drop-shadow(0 0 36px rgba(245, 130, 10, 0.75)); }
 }
