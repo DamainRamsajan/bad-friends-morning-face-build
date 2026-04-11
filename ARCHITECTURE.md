@@ -1,5 +1,341 @@
 ARCHITECTURE.md
 
+UPDATE April 10th 10:19pm
+
+ARCHITECTURE.md - Complete Update (This Chat Session)
+markdown
+---
+## APPENDIX B: Architectural Decisions - April 9-10, 2026 Session
+### All architectural changes and design standards established in this chat
+
+---
+
+## 1. NEW DESIGN STANDARD (Marketing Audit)
+
+### 1.1 Core Principle
+
+**The LandingScreen redesign (v1.0.1 Phase 1) is now the official design standard for ALL screens.**
+
+All future UI work must follow these principles established in the marketing audit:
+
+| Principle | Implementation |
+|-----------|----------------|
+| Background | Near-black (#0d0d0d) - never orange gradient |
+| Headings | Bebas Neue font, uppercase, white or yellow |
+| Cards | #1a1a1a background, orange top border (3px), rounded-xl |
+| Primary CTAs | Yellow (#f5c518) with orange hover (#f5820a) |
+| Secondary CTAs | Transparent with orange border |
+| Accent color | Orange (#f5820a) for borders, icons, dividers |
+| Highlight color | Yellow (#f5c518) for important text |
+| Body text | DM Sans, #cccccc (secondary), #888888 (muted) |
+
+### 1.2 Color Palette (Official)
+
+```css
+:root {
+    /* Backgrounds */
+    --bg-page: #0d0d0d;        /* Main background - near black */
+    --bg-card: #1a1a1a;        /* Card background */
+    --bg-input: #1a1a1a;        /* Input background */
+    
+    /* Brand Colors */
+    --orange: #f5820a;          /* Accent - borders, icons, secondary CTAs */
+    --orange-deep: #e86a00;     /* Darker orange for hover states */
+    --yellow: #f5c518;          /* Primary CTA - yellow button */
+    
+    /* Text Colors */
+    --text-primary: #ffffff;    /* White - headings, important text */
+    --text-secondary: #cccccc;  /* Light gray - body text */
+    --text-muted: #888888;      /* Dark gray - muted text */
+    
+    /* Card Styles */
+    --card-bg: #1a1a1a;
+    --card-border-top: 3px solid var(--orange);
+    --card-border-radius: 1rem;
+    
+    /* Button Styles */
+    --btn-primary-bg: var(--yellow);
+    --btn-primary-hover: var(--orange);
+    --btn-primary-text: #1a1000;
+    --btn-secondary-border: 2px solid var(--orange);
+    --btn-secondary-text: var(--orange);
+}
+1.3 Typography System
+css
+/* Headings - Bebas Neue (bold, uppercase) */
+h1, h2, h3, h4, .font-display {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+/* Body Text - DM Sans */
+body, p, .font-body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--text-secondary);
+}
+
+/* Heading Sizes */
+h1 { font-size: clamp(48px, 8vw, 96px); }
+h2 { font-size: clamp(32px, 5vw, 52px); }
+h3 { font-size: clamp(22px, 3vw, 30px); }
+1.4 Card Design Standard
+css
+/* Standard Card - Used on ALL screens */
+.bf-card {
+    background: var(--bg-card);
+    border-top: 3px solid var(--orange);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.bf-card:hover {
+    box-shadow: 0 8px 20px rgba(245, 130, 10, 0.15);
+    transform: translateY(-2px);
+}
+1.5 Button System
+Class	Purpose	Styling
+.btn-primary	Primary CTA	Yellow bg, dark text, orange hover
+.btn-secondary	Secondary action	Transparent, orange border, orange text
+.btn-tab	Tab navigation	Dark bg, gray text, gradient on active
+.btn-reaction	Reaction buttons	Dark bg, colored border on hover
+.btn-like	Like button	Red/orange gradient
+.nav-item	Bottom nav	Gray, orange on active with lift
+2. FOUR FRIENDSHIP LAYERS ARCHITECTURE
+2.1 Layer Structure
+text
+LAYER 1: FRIENDS (Follow)
+├── Action: Follow/Unfollow
+├── Visibility: See morning faces + answers
+├── Table: follows
+└── Can DM: No
+
+LAYER 2: BAD FRIENDS (Mutual Humor)
+├── Trigger: 3+ mutual 💀 reactions in 7 days
+├── Action: Automatic detection + opt-in
+├── Table: bad_friends
+├── Can DM: Yes (text only)
+└── Special: "Bad Friends" badge
+
+LAYER 3: WORST FRIENDS (Romantic Match)
+├── Trigger: Mutual ❤️ in Discover
+├── Table: matches (status='accepted')
+├── Can DM: Yes (text, voice, media)
+└── Special: "Worst Friends" badge
+
+LAYER 4: MATCHES (Pending)
+├── Trigger: One-way ❤️
+├── Table: matches (status='pending')
+└── Expires: 7 days without response
+2.2 Auto-Detection Trigger
+sql
+-- Detects 3+ mutual 💀 reactions in 7 days
+-- Runs automatically on each reaction insert
+CREATE TRIGGER trigger_detect_bad_friends
+    AFTER INSERT ON reactions
+    FOR EACH ROW
+    EXECUTE FUNCTION detect_bad_friends();
+2.3 Friendship Service
+python
+class FriendshipService:
+    """Complete friendship layer management"""
+    
+    # Layer 1
+    async def follow(self, follower_id, followed_id)
+    async def unfollow(self, follower_id, followed_id)
+    async def get_followers(self, user_id)
+    async def get_following(self, user_id)
+    
+    # Layer 2
+    async def get_bad_friends(self, user_id)
+    async def get_pending_bad_friends(self, user_id)
+    async def accept_bad_friend(self, user_id, other_id)
+    
+    # Layer 3 & 4
+    async def get_worst_friends(self, user_id)
+    async def get_pending_matches(self, user_id)
+    async def get_friendship_summary(self, user_id)
+3. ONBOARDING REDIRECT ARCHITECTURE
+3.1 LocalStorage Pattern (Official Solution)
+javascript
+// Why: Prevents race conditions between frontend state and backend persistence
+// When: After dealbreakers completion
+
+// Set flag immediately on completion
+localStorage.setItem('bf_onboarding_complete', 'true');
+window.location.href = '/app';
+
+// Check flag before API call in App.jsx
+const localFlag = localStorage.getItem('bf_onboarding_complete');
+if (localFlag === 'true') {
+    setHasCompletedOnboarding(true);
+    return;
+}
+
+// Clear on logout
+localStorage.removeItem('bf_onboarding_complete');
+4. SUPABASE DNS FAILURE - MIGRATION ARCHITECTURE
+4.1 Current State
+Component	Status	Evidence
+Database DNS	❌ Failing	NXDOMAIN
+Auth	✅ Working	Separate infrastructure
+Storage	✅ Working	Direct URLs accessible
+4.2 Migration Decision
+Migrate database to Neon PostgreSQL in v1.1
+
+text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    POST-MIGRATION ARCHITECTURE                               │
+│                                                                              │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │   Netlify    │────▶│    Render    │────▶│    Neon      │                │
+│  │  (Frontend)  │◀────│  (Backend)   │◀────│ (PostgreSQL) │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│         │                    │                    │                         │
+│         ▼                    ▼                    ▼                         │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │  Supabase    │     │  Supabase    │     │  Supabase    │                │
+│  │  (Auth)      │     │  (Storage)   │     │  (Realtime)  │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│                                                                              │
+│  Keep Supabase for Auth and Storage. Migrate only database to Neon.         │
+└─────────────────────────────────────────────────────────────────────────────┘
+4.3 Why Neon
+Requirement	Neon	Supabase
+DNS reliability	✅	❌
+PostgreSQL compatible	✅	✅
+Free tier	0.5 GB, 190 compute hrs	0.5 GB, pauses after 1 week
+Always-on available	✅ ($19/mo Launch tier)	✅ ($25/mo Pro tier)
+5. TAILWIND CSS DECISION
+5.1 Version Lock
+Decision: Lock to Tailwind CSS v3.4.17
+
+Reason: v4 has compatibility issues with custom color classes and the @tailwind directive pattern we rely on.
+
+bash
+# Locked versions in package.json
+"tailwindcss": "3.4.17",
+"postcss": "8.4.47",
+"autoprefixer": "10.4.20"
+5.2 Configuration Pattern
+js
+// tailwind.config.js - Standard v3 format
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        'badfriends': { ... },
+        'primary': '#ef4444',
+        'accent': '#f59e0b',
+      },
+    },
+  },
+  plugins: [],
+}
+css
+/* index.css - Standard v3 format */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+6. BUTTON CLASS SYSTEM (Official)
+6.1 Class Reference
+Class	When to Use
+.btn-primary	Submit, Register, Login, Complete Onboarding, Next Question, Accept
+.btn-secondary	Skip, Pass, Cancel, Refresh
+.btn-tab	All tab navigation (add .active for current tab)
+.btn-reaction	🍜 🔥 🐯 💀 reaction buttons (add hover class)
+.btn-like	Like button in Discover screen
+.nav-item	Bottom navigation items (add .active for current page)
+6.2 Usage Examples
+jsx
+{/* Primary CTA */}
+<button className="btn-primary">Submit Answer 💀</button>
+
+{/* Secondary Action */}
+<button className="btn-secondary">Skip</button>
+
+{/* Tab with active state */}
+<button className={`btn-tab ${activeTab === 'faces' ? 'active' : ''}`}>
+    Morning Faces
+</button>
+
+{/* Reaction Button */}
+<button className="btn-reaction btn-reaction-bobo">
+    🍜 <span>12</span>
+</button>
+
+{/* Bottom Navigation */}
+<button className={`nav-item ${location.pathname === '/app' ? 'active' : ''}`}>
+    🏠 Home
+</button>
+7. DEPLOYMENT ARCHITECTURE
+7.1 Frontend (Netlify)
+bash
+# Required for SPA routing
+# File: public/_redirects
+/* /index.html 200
+
+# Environment variables
+VITE_SUPABASE_URL=https://valyrdrdwceszcuuytprn.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_API_URL=https://bad-friends-morning-face-build.onrender.com
+7.2 Backend (Render)
+dockerfile
+# Dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y gcc g++
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
+7.3 CORS Configuration
+python
+# Production CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://bad-friends-morning-face.netlify.app",
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+8. NEW API ENDPOINTS (Friendship Layer)
+Endpoint	Method	Service
+/friends/follow/{user_id}	POST	FriendshipService
+/friends/follow/{user_id}	DELETE	FriendshipService
+/friends/followers	GET	FriendshipService
+/friends/following	GET	FriendshipService
+/bad-friends/list	GET	FriendshipService
+/bad-friends/pending	GET	FriendshipService
+/bad-friends/accept/{user_id}	POST	FriendshipService
+/worst-friends/list	GET	FriendshipService
+/matches/pending	GET	FriendshipService
+/friends/summary	GET	FriendshipService
+9. KNOWN ARCHITECTURAL ISSUES
+Issue	Status	Target Fix
+Supabase DNS (NXDOMAIN)	❌ Open	v1.1 (Neon migration)
+Button image transparency	🟡 In Progress	v1.0.1
+Onboarding redirect	✅ Fixed	v1.0.0
+Tailwind v4 incompatibility	✅ Fixed	Locked to v3
+10. FUTURE ARCHITECTURAL DIRECTIONS (v1.1+)
+Feature	Target Version	Description
+Neon Database Migration	v1.1	Replace Supabase PostgreSQL
+Feed Component	v1.1	Real friends' morning faces and answers
+Real Matching Logic	v1.1	Replace mock data in Discover
+AI Question Generation	v1.1	Groq API integration
+Sisterhood Backend	v1.1	Complete implementation
+Desktop Grid Layout	v1.2	Responsive multi-column feed
+END OF ARCHITECTURE UPDATE
+
+---
+
  ARCHITECTURE.md - FINAL v1.0
 ## Bad Friends Morning Face Build
 ### Last Updated: April 8, 2026

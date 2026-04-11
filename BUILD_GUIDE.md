@@ -1,3 +1,827 @@
+April 10th 10:45pm
+BUILD_GUIDE.md - Update Section (This Chat Only)
+markdown
+---
+## PHASE 6.4 - 6.9: Features Built in This Chat Session (April 9-10, 2026)
+### All steps completed in this session
+
+---
+
+## Step 6.4: Four Friendship Layers
+
+### 6.4.1 Create Database Tables
+
+**Run in Supabase SQL Editor:**
+
+```sql
+-- Follows table (Layer 1: Friends)
+CREATE TABLE IF NOT EXISTS follows (
+    follower_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    followed_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (follower_id, followed_id)
+);
+
+-- Bad Friends table (Layer 2: Mutual humor)
+CREATE TABLE IF NOT EXISTS bad_friends (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_a UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_b UUID REFERENCES users(id) ON DELETE CASCADE,
+    detection_count INTEGER DEFAULT 1,
+    detected_at TIMESTAMP DEFAULT NOW(),
+    accepted_at TIMESTAMP,
+    UNIQUE(user_a, user_b)
+);
+
+-- Enable RLS
+ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bad_friends ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+CREATE POLICY "Users can manage their follows"
+    ON follows FOR ALL USING (auth.uid() = follower_id);
+
+CREATE POLICY "Users can see who follows them"
+    ON follows FOR SELECT USING (auth.uid() = followed_id);
+
+CREATE POLICY "Bad Friends participants can see"
+    ON bad_friends FOR SELECT USING (auth.uid() = user_a OR auth.uid() = user_b);
+
+-- Auto-detect Bad Friends function
+CREATE OR REPLACE FUNCTION detect_bad_friends()
+RETURNS TRIGGER AS $$
+BEGIN
+    WITH mutual_dead AS (
+        SELECT 
+            LEAST(r1.user_id, r2.user_id) as user_a,
+            GREATEST(r1.user_id, r2.user_id) as user_b,
+            COUNT(*) as mutual_count
+        FROM reactions r1
+        JOIN reactions r2 
+            ON r1.target_id = r2.target_id 
+            AND r1.target_type = r2.target_type
+            AND r1.reaction_type = 'dead' 
+            AND r2.reaction_type = 'dead'
+            AND r1.user_id != r2.user_id
+        WHERE r1.created_at > NOW() - INTERVAL '7 days'
+        GROUP BY LEAST(r1.user_id, r2.user_id), GREATEST(r1.user_id, r2.user_id)
+        HAVING COUNT(*) >= 3
+    )
+    INSERT INTO bad_friends (user_a, user_b, detected_at, detection_count)
+    SELECT user_a, user_b, NOW(), mutual_count
+    FROM mutual_dead
+    ON CONFLICT (user_a, user_b) 
+    DO UPDATE SET 
+        detection_count = EXCLUDED.detection_count,
+        detected_at = NOW()
+    WHERE bad_friends.accepted_at IS NULL;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger for new reactions
+CREATE TRIGGER trigger_detect_bad_friends
+    AFTER INSERT ON reactions
+    FOR EACH ROW
+    EXECUTE FUNCTION detect_bad_friends();
+
+-- Friendship summary function
+CREATE OR REPLACE FUNCTION get_friendship_summary(user_id UUID)
+RETURNS TABLE (layer TEXT, count BIGINT) AS $$
+BEGIN
+    RETURN QUERY SELECT 'following'::TEXT, COUNT(*)::BIGINT FROM follows WHERE follower_id = user_id;
+    RETURN QUERY SELECT 'followers'::TEXT, COUNT(*)::BIGINT FROM follows WHERE followed_id = user_id;
+    RETURN QUERY SELECT 'bad_friends'::TEXT, COUNT(*)::BIGINT FROM bad_friends WHERE (user_a = user_id OR user_b = user_id) AND accepted_at IS NOT NULL;
+    RETURN QUERY SELECT 'pending_bad_friends'::TEXT, COUNT(*)::BIGINT FROM bad_friends WHERE (user_a = user_id OR user_b = user_id) AND accepted_at IS NULL;
+    RETURN QUERY SELECT 'worst_friends'::TEXT, COUNT(*)::BIGINT FROM matches WHERE (user_a = user_id OR user_b = user_id) AND status = 'accepted';
+    RETURN QUERY SELECT 'pending_matches'::TEXT, COUNT(*)::BIGINT FROM matches WHERE (user_a = user_id OR user_b = user_id) AND status = 'pending';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+6.4.2 Create Friendship Service
+File: backend/services/friendship_service.py
+
+python
+from supabase import create_client
+from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+class FriendshipService:
+    
+    # LAYER 1: FOLLOWS (Friends)
+    async def follow(self, follower_id: str, followed_id: str):
+        existing = supabase.table("follows").select("*").eq("follower_id", follower_id).eq("followed_id", followed_id).execute()
+        if existing.data:
+            return {"success": False, "message": "Already following"}
+        result = supabase.table("follows").insert({"follower_id": follower_id, "followed_id": followed_id}).execute()
+        return {"success": True, "followed": followed_id}
+    
+    async def unfollow(self, follower_id: str, followed_id: str):
+        supabase.table("follows").delete().eq("follower_id", follower_id).eq("followed_id", followed_id).execute()
+        return {"success": True, "unfollowed": followed_id}
+    
+    async def get_followers(self, user_id: str):
+        result = supabase.table("follows").select("follower_id").eq("followed_id", user_id).execute()
+        return [f["follower_id"] for f in result.data]
+    
+    async def get_following(self, user_id: str):
+        result = supabase.table("follows").select("followed_id").eq("follower_id", user_id).execute()
+        return [f["followed_id"] for f in result.data]
+    
+    # LAYER 2: BAD FRIENDS
+    async def get_bad_friends(self, user_id: str):
+        result = supabase.table("bad_friends").select("*").filter("user_a", "eq", user_id).or_(f"user_b.eq.{user_id}").not_.is_("accepted_at", "null").execute()
+        friends = []
+        for row in result.data:
+            other_id = row["user_b"] if row["user_a"] == user_id else row["user_a"]
+            friends.append({"user_id": other_id, "detected_at": row["detected_at"], "accepted_at": row["accepted_at"]})
+        return friends
+    
+    async def get_pending_bad_friends(self, user_id: str):
+        result = supabase.table("bad_friends").select("*").filter("user_a", "eq", user_id).or_(f"user_b.eq.{user_id}").is_("accepted_at", "null").execute()
+        pending = []
+        for row in result.data:
+            other_id = row["user_b"] if row["user_a"] == user_id else row["user_a"]
+            pending.append({"user_id": other_id, "detected_at": row["detected_at"], "detection_count": row.get("detection_count", 1)})
+        return pending
+    
+    async def accept_bad_friend(self, user_id: str, other_id: str):
+        result = supabase.table("bad_friends").update({"accepted_at": datetime.now().isoformat()}).filter("user_a", "eq", user_id).filter("user_b", "eq", other_id).execute()
+        if not result.data:
+            result = supabase.table("bad_friends").update({"accepted_at": datetime.now().isoformat()}).filter("user_a", "eq", other_id).filter("user_b", "eq", user_id).execute()
+        return {"success": len(result.data) > 0}
+    
+    # LAYER 3 & 4: WORST FRIENDS & PENDING
+    async def get_worst_friends(self, user_id: str):
+        result = supabase.table("matches").select("*").filter("user_a", "eq", user_id).or_(f"user_b.eq.{user_id}").eq("status", "accepted").execute()
+        matches = []
+        for row in result.data:
+            other_id = row["user_b"] if row["user_a"] == user_id else row["user_a"]
+            matches.append({"user_id": other_id, "matched_at": row["matched_at"]})
+        return matches
+    
+    async def get_pending_matches(self, user_id: str):
+        result = supabase.table("matches").select("*").filter("user_a", "eq", user_id).or_(f"user_b.eq.{user_id}").eq("status", "pending").execute()
+        pending = []
+        for row in result.data:
+            other_id = row["user_b"] if row["user_a"] == user_id else row["user_a"]
+            pending.append({"user_id": other_id, "matched_at": row["matched_at"]})
+        return pending
+    
+    async def get_friendship_summary(self, user_id: str):
+        result = supabase.rpc("get_friendship_summary", {"user_id": user_id}).execute()
+        summary = {"following": 0, "followers": 0, "bad_friends": 0, "pending_bad_friends": 0, "worst_friends": 0, "pending_matches": 0}
+        for row in result.data:
+            summary[row["layer"]] = row["count"]
+        return summary
+
+friendship_service = FriendshipService()
+6.4.3 Add Friendship Endpoints to main.py
+python
+from services.friendship_service import friendship_service
+
+# LAYER 1: FOLLOWS
+@app.post("/friends/follow/{user_id}")
+async def follow_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot follow yourself")
+    result = await friendship_service.follow(current_user["id"], user_id)
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result.get("message", "Already following"))
+    return result
+
+@app.delete("/friends/follow/{user_id}")
+async def unfollow_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    result = await friendship_service.unfollow(current_user["id"], user_id)
+    return result
+
+@app.get("/friends/followers")
+async def get_my_followers(current_user: dict = Depends(get_current_user)):
+    followers = await friendship_service.get_followers(current_user["id"])
+    return {"success": True, "followers": followers}
+
+@app.get("/friends/following")
+async def get_my_following(current_user: dict = Depends(get_current_user)):
+    following = await friendship_service.get_following(current_user["id"])
+    return {"success": True, "following": following}
+
+# LAYER 2: BAD FRIENDS
+@app.get("/bad-friends/list")
+async def get_bad_friends(current_user: dict = Depends(get_current_user)):
+    friends = await friendship_service.get_bad_friends(current_user["id"])
+    return {"success": True, "bad_friends": friends}
+
+@app.get("/bad-friends/pending")
+async def get_pending_bad_friends(current_user: dict = Depends(get_current_user)):
+    pending = await friendship_service.get_pending_bad_friends(current_user["id"])
+    return {"success": True, "pending": pending}
+
+@app.post("/bad-friends/accept/{user_id}")
+async def accept_bad_friend(user_id: str, current_user: dict = Depends(get_current_user)):
+    result = await friendship_service.accept_bad_friend(current_user["id"], user_id)
+    if not result["success"]:
+        raise HTTPException(status_code=404, detail="Bad Friend request not found")
+    return {"success": True}
+
+# LAYER 3 & 4: WORST FRIENDS & PENDING
+@app.get("/worst-friends/list")
+async def get_worst_friends(current_user: dict = Depends(get_current_user)):
+    matches = await friendship_service.get_worst_friends(current_user["id"])
+    return {"success": True, "worst_friends": matches}
+
+@app.get("/matches/pending")
+async def get_pending_matches(current_user: dict = Depends(get_current_user)):
+    pending = await friendship_service.get_pending_matches(current_user["id"])
+    return {"success": True, "pending": pending}
+
+@app.get("/friends/summary")
+async def get_friendship_summary(current_user: dict = Depends(get_current_user)):
+    summary = await friendship_service.get_friendship_summary(current_user["id"])
+    return {"success": True, "summary": summary}
+Step 6.5: Create MatchesScreen
+File: frontend/src/screens/MatchesScreen.jsx
+
+jsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import BottomNav from '../components/BottomNav';
+
+const MatchesScreen = () => {
+  const [activeTab, setActiveTab] = useState('worst');
+  const [worstFriends, setWorstFriends] = useState([]);
+  const [badFriends, setBadFriends] = useState([]);
+  const [pendingBad, setPendingBad] = useState([]);
+  const [pendingMatches, setPendingMatches] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+  
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      const [worstRes, badRes, pendingBadRes, pendingMatchRes, summaryRes] = await Promise.all([
+        fetch(`${API_URL}/worst-friends/list`, { headers }),
+        fetch(`${API_URL}/bad-friends/list`, { headers }),
+        fetch(`${API_URL}/bad-friends/pending`, { headers }),
+        fetch(`${API_URL}/matches/pending`, { headers }),
+        fetch(`${API_URL}/friends/summary`, { headers })
+      ]);
+      
+      const worstData = await worstRes.json();
+      const badData = await badRes.json();
+      const pendingBadData = await pendingBadRes.json();
+      const pendingMatchData = await pendingMatchRes.json();
+      const summaryData = await summaryRes.json();
+      
+      if (worstData.success) setWorstFriends(worstData.worst_friends);
+      if (badData.success) setBadFriends(badData.bad_friends);
+      if (pendingBadData.success) setPendingBad(pendingBadData.pending);
+      if (pendingMatchData.success) setPendingMatches(pendingMatchData.pending);
+      if (summaryData.success) setSummary(summaryData.summary);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const acceptBadFriend = async (userId) => {
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      await fetch(`${API_URL}/bad-friends/accept/${userId}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchAllData();
+    } catch (error) {
+      console.error('Error accepting bad friend:', error);
+    }
+  };
+  
+  // Rest of component rendering...
+};
+
+export default MatchesScreen;
+Step 6.6: Create ProfileScreen
+File: frontend/src/screens/ProfileScreen.jsx
+
+jsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import BottomNav from '../components/BottomNav';
+
+const ProfileScreen = () => {
+  const [profile, setProfile] = useState(null);
+  const [morningFaces, setMorningFaces] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+  
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      const [profileRes, facesRes, summaryRes] = await Promise.all([
+        fetch(`${API_URL}/profile`, { headers }),
+        fetch(`${API_URL}/morning-face/feed?limit=10`, { headers }),
+        fetch(`${API_URL}/friends/summary`, { headers })
+      ]);
+      
+      const profileData = await profileRes.json();
+      const facesData = await facesRes.json();
+      const summaryData = await summaryRes.json();
+      
+      if (profileData.success) setProfile(profileData.profile);
+      if (facesData.success) setMorningFaces(facesData.faces);
+      if (summaryData.success) setSummary(summaryData.summary);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleLogout = async () => {
+    localStorage.removeItem('bf_onboarding_complete');
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
+  
+  // Rest of component rendering...
+};
+
+export default ProfileScreen;
+Step 6.7: Create BottomNav
+File: frontend/src/components/BottomNav.jsx
+
+jsx
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const BottomNav = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const navItems = [
+    { id: 'home', icon: '🏠', label: 'Home', path: '/app' },
+    { id: 'discover', icon: '👀', label: 'Discover', path: '/app/discover' },
+    { id: 'matches', icon: '💀', label: 'Matches', path: '/app/matches' },
+    { id: 'profile', icon: '😈', label: 'Profile', path: '/app/profile' },
+  ];
+  
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-badfriends-bg/95 backdrop-blur-lg border-t border-badfriends-border py-2 z-50">
+      <div className="max-w-md mx-auto flex justify-around">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => navigate(item.path)}
+            className={`nav-item flex flex-col items-center gap-1 px-3 py-1 rounded-xl ${
+              location.pathname === item.path ? 'active' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <span className="text-xl">{item.icon}</span>
+            <span className="text-xs font-medium">{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+};
+
+export default BottomNav;
+Step 6.8: Create DiscoverScreen
+File: frontend/src/screens/DiscoverScreen.jsx
+
+jsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import BottomNav from '../components/BottomNav';
+import { getMockDiscoverCandidates } from '../utils/mockData';
+
+const DiscoverScreen = () => {
+  const [candidates, setCandidates] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [ratedCount, setRatedCount] = useState(0);
+  const [facesUnlocked, setFacesUnlocked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  const UNLOCK_THRESHOLD = 3;
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  
+  useEffect(() => {
+    fetchCandidates();
+  }, []);
+  
+  const fetchCandidates = async () => {
+    setLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const response = await fetch(`${API_URL}/matches/discover`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success && data.candidates && data.candidates.length > 0) {
+        setCandidates(data.candidates);
+      } else {
+        setCandidates(getMockDiscoverCandidates());
+      }
+    } catch (error) {
+      console.error('Error fetching candidates:', error);
+      setCandidates(getMockDiscoverCandidates());
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const rateAnswer = async (candidateId, isWorstFriend) => {
+    if (isWorstFriend) {
+      try {
+        const token = (await supabase.auth.getSession()).data.session?.access_token;
+        await fetch(`${API_URL}/reactions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            target_type: 'answer',
+            target_id: candidateId,
+            reaction_type: 'dead'
+          })
+        });
+      } catch (error) {
+        console.error('Error rating answer:', error);
+      }
+    }
+    
+    const newRatedCount = ratedCount + 1;
+    setRatedCount(newRatedCount);
+    
+    if (newRatedCount >= UNLOCK_THRESHOLD && !facesUnlocked) {
+      setFacesUnlocked(true);
+    }
+    
+    setCurrentIndex(prev => prev + 1);
+  };
+  
+  const likeUser = async (userId) => {
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const response = await fetch(`${API_URL}/matches/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ target_user_id: userId })
+      });
+      const data = await response.json();
+      
+      if (data.mutual) {
+        alert('🎉 It\'s a match! Start chatting!');
+      } else {
+        alert('❤️ Like sent! If they like you back, you\'ll match.');
+      }
+      
+      setCurrentIndex(prev => prev + 1);
+    } catch (error) {
+      console.error('Error liking user:', error);
+    }
+  };
+  
+  // Rest of component rendering with buttons using btn-primary, btn-secondary, btn-like classes
+};
+
+export default DiscoverScreen;
+Step 6.9: Onboarding Redirect Fix
+6.9.1 Update OnboardingScreen.jsx
+File: frontend/src/screens/OnboardingScreen.jsx
+
+javascript
+const saveDealbreakers = async (data) => {
+  setLoading(true);
+  try {
+    const token = await getToken();
+    const response = await fetch(`${API_URL}/onboarding/dealbreakers`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (response.ok) {
+      setDealbreakersData(data);
+      localStorage.setItem('bf_onboarding_complete', 'true');
+      window.location.href = '/app';
+    }
+  } catch (error) {
+    console.error('Error saving dealbreakers:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+6.9.2 Update App.jsx Check
+File: frontend/src/App.jsx
+
+javascript
+const checkOnboardingStatus = async () => {
+  if (!user) {
+    setCheckingOnboarding(false);
+    return;
+  }
+  
+  // First check localStorage for fast response
+  const localFlag = localStorage.getItem('bf_onboarding_complete');
+  if (localFlag === 'true') {
+    console.log('Using localStorage flag - onboarding complete');
+    setHasCompletedOnboarding(true);
+    setCheckingOnboarding(false);
+    return;
+  }
+  
+  // Fallback to API check
+  try {
+    const token = (await supabase.auth.getSession()).data.session?.access_token;
+    const response = await fetch(`${API_URL}/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    
+    if (data.success && data.profile) {
+      const onboardingComplete = data.profile.onboarding_complete === true;
+      if (onboardingComplete) {
+        localStorage.setItem('bf_onboarding_complete', 'true');
+      }
+      setHasCompletedOnboarding(onboardingComplete);
+      setUserGender(data.profile.gender);
+    }
+  } catch (error) {
+    console.error('Error checking onboarding:', error);
+  } finally {
+    setCheckingOnboarding(false);
+  }
+};
+6.9.3 Update ProfileScreen Logout
+File: frontend/src/screens/ProfileScreen.jsx
+
+javascript
+const handleLogout = async () => {
+  localStorage.removeItem('bf_onboarding_complete');
+  await supabase.auth.signOut();
+  window.location.href = '/';
+};
+Step 6.10: CSS Button System
+File: frontend/src/index.css (Add these classes)
+
+css
+/* Button System - Added in this session */
+.btn-primary {
+    background: linear-gradient(135deg, #f5820a 0%, #f5c518 100%);
+    color: #1a1000;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 24px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 15px rgba(245, 130, 10, 0.4);
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid #f5820a;
+    color: #f5820a;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-tab {
+    background: #1a1f2e;
+    color: #9ca3af;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-tab.active {
+    background: linear-gradient(135deg, #f5820a, #f5c518);
+    color: #1a1000;
+    box-shadow: 0 2px 10px rgba(245, 130, 10, 0.3);
+}
+
+.btn-reaction {
+    background: #1a1f2e;
+    border: 1px solid #2d3a5f;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-reaction-bobo:hover { background: rgba(245, 155, 11, 0.2); border-color: #f59e0b; }
+.btn-reaction-cheeto:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+.btn-reaction-tiger:hover { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+.btn-reaction-dead:hover { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; }
+
+.btn-like {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: white;
+    font-weight: 800;
+    padding: 14px 24px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: #f5820a;
+    transform: translateY(-4px);
+    text-shadow: 0 0 8px rgba(245, 130, 10, 0.5);
+}
+Step 6.11: Tailwind CSS Downgrade
+bash
+# Downgrade from v4.2.2 to v3.4.17
+cd ~/bad-friends-morning-face-build/frontend
+npm install tailwindcss@3.4.17 postcss@8.4.47 autoprefixer@10.4.20
+npm uninstall @tailwindcss/postcss @tailwindcss/node
+npx tailwindcss init -p
+File: frontend/postcss.config.js
+
+javascript
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+Step 6.12: Expand Mock Data
+File: frontend/src/utils/mockData.js
+
+Created with 30+ entries for:
+
+Morning faces (12+ with funny captions)
+
+Answers (15+ with CMI scores)
+
+Discover candidates (10+ with past funny answers)
+
+Motivational messages based on CMI score
+
+Step 6.13: v1.0.0 Deployment
+bash
+# Create release branch
+git checkout -b v1.0.0-release
+git push origin v1.0.0-release
+
+# Tag the release
+git tag v1.0.0
+git push origin v1.0.0
+
+# Merge to main
+git checkout main
+git merge v1.0.0-release
+git push origin main
+Step 6.14: v1.0.1 Phase 1 - LandingScreen Redesign
+File: frontend/src/screens/LandingScreen.jsx
+
+Complete redesign following marketing audit:
+
+Background: near-black (#0d0d0d)
+
+Bebas Neue fonts for headings
+
+Yellow CTA button with orange hover
+
+Social proof micro-copy
+
+Feature cards with orange top border
+
+How It Works with giant background numbers
+
+Safety section as 2x2 grid
+
+Footer visibility fix
+
+Step 6.15: Fix Duplicate VITE_API_URL in .env
+File: frontend/.env
+
+env
+VITE_SUPABASE_URL=https://valyrdrdwceszcuuytprn.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_API_URL=http://localhost:8000
+Step 6.16: Create MorningFaceThumbnail Component
+File: frontend/src/components/MorningFaceThumbnail.jsx
+
+jsx
+import React, { useState } from 'react';
+import MorningFaceCapture from './MorningFaceCapture';
+
+const MorningFaceThumbnail = ({ streak, onUploadComplete }) => {
+  const [showCamera, setShowCamera] = useState(false);
+  
+  if (showCamera) {
+    return (
+      <>
+        <div className="fixed inset-0 bg-black/70 z-50" onClick={() => setShowCamera(false)} />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-md bg-badfriends-card rounded-2xl border border-badfriends-border overflow-hidden shadow-2xl">
+          <div className="p-4 border-b border-badfriends-border flex justify-between items-center">
+            <h3 className="text-white font-semibold">Take Morning Face</h3>
+            <button onClick={() => setShowCamera(false)} className="text-gray-400 hover:text-white text-xl">✕</button>
+          </div>
+          <div className="p-4">
+            <MorningFaceCapture 
+              onUploadComplete={(newStreak) => {
+                setShowCamera(false);
+                onUploadComplete(newStreak);
+              }}
+              currentStreak={streak}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+  
+  return (
+    <button 
+      onClick={() => setShowCamera(true)}
+      className="w-16 h-16 bg-gradient-to-br from-[#f5820a] to-[#f5c518] border-2 border-[#f5820a] rounded-2xl flex flex-col items-center justify-center hover:scale-105 transition-all duration-200 active:scale-95 shadow-lg shadow-orange-500/30"
+    >
+      <span className="text-2xl drop-shadow-lg">📷</span>
+      <span className="text-[10px] text-[#1a1000] font-bold mt-1 drop-shadow-sm">TAP</span>
+    </button>
+  );
+};
+
+export default MorningFaceThumbnail;
+COMPLETION CHECKLIST (This Session)
+Step	Component	Status
+6.4.1	Database tables (follows, bad_friends, triggers)	✅
+6.4.2	friendship_service.py	✅
+6.4.3	Friendship endpoints (10+)	✅
+6.5	MatchesScreen.jsx	✅
+6.6	ProfileScreen.jsx	✅
+6.7	BottomNav.jsx	✅
+6.8	DiscoverScreen.jsx	✅
+6.9	Onboarding redirect fix	✅
+6.10	CSS button system	✅
+6.11	Tailwind CSS downgrade	✅
+6.12	Mock data expansion	✅
+6.13	v1.0.0 deployment	✅
+6.14	LandingScreen redesign (v1.0.1 Phase 1)	✅
+6.15	Fix duplicate .env entry	✅
+6.16	MorningFaceThumbnail component	✅
+END OF BUILD GUIDE UPDATE
+
+
+---
 Updated Step Plan (From Here to v1 Launch) april  8th 2026 11:24pm
 Here are the remaining steps in order with estimated times:
 

@@ -1,5 +1,264 @@
 
 markdown
+
+PROJECT_STATE.md - Complete Update (This Chat Session)
+markdown
+---
+## UPDATE: April 9-10, 2026 - Complete Session Record
+### All work completed in this chat session
+
+---
+
+## 1. NEWLY COMPLETED FEATURES
+
+### 1.1 Friendship Layers (Phase 6.4)
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| `follows` table | ✅ Created | follower_id, followed_id, created_at |
+| `bad_friends` table | ✅ Created | user_a, user_b, detection_count, detected_at, accepted_at |
+| `detect_bad_friends()` trigger | ✅ Created | Auto-detects 3+ mutual 💀 reactions in 7 days |
+| `get_friendship_summary()` function | ✅ Created | Returns counts for all 4 friendship layers |
+| `friendship_service.py` | ✅ Created | 10+ methods for friendship management |
+| Friendship endpoints (10+) | ✅ Added | Follow, unfollow, bad_friends, worst_friends, etc. |
+
+### 1.2 Frontend Screens (Phase 6.5-6.9)
+
+| Screen | Status | Features |
+|--------|--------|----------|
+| `MatchesScreen.jsx` | ✅ Created | 4 friendship layers with tabs, accept buttons, chat placeholders |
+| `ProfileScreen.jsx` | ✅ Created | User profile, stats, morning face history, logout |
+| `DiscoverScreen.jsx` | ✅ Created | Card stack, 3 ratings to unlock faces, 💀/skip/like buttons |
+| `SisterhoodScreen.jsx` | ✅ Created | Placeholder for women-only safety space |
+| `BottomNav.jsx` | ✅ Created | 4-tab navigation with active states |
+| `Banner.jsx` | ✅ Created | Top banner with streak display |
+| `MorningFaceThumbnail.jsx` | ✅ Created | Compact camera button (expands to modal) |
+
+### 1.3 CSS & UI System
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Tailwind CSS | ✅ Downgraded | v4.2.2 → v3.4.17 |
+| Button classes | ✅ Created | `.btn-primary`, `.btn-secondary`, `.btn-tab`, `.btn-reaction`, `.btn-like`, `.nav-item` |
+| Gradient background | ✅ Applied | Orange/yellow gradient on all screens |
+| Mock data | ✅ Expanded | 3x larger dataset with funny Bad Friends content |
+
+### 1.4 Onboarding Redirect Fix
+
+| Solution | Status | Details |
+|----------|--------|---------|
+| localStorage flag | ✅ Implemented | `bf_onboarding_complete` stored on completion |
+| App.jsx check | ✅ Updated | Checks localStorage first before API call |
+| Logout handler | ✅ Updated | Clears localStorage on logout |
+
+### 1.5 Deployment (v1.0.0)
+
+| Service | URL | Status |
+|---------|-----|--------|
+| Netlify (Frontend) | https://bad-friends-morning-face.netlify.app | ✅ LIVE |
+| Render (Backend) | https://bad-friends-morning-face-build.onrender.com | ✅ LIVE |
+| Git tag | `v1.0.0` | ✅ Created |
+| Branch | `v1.0.0-release` | ✅ Created |
+
+### 1.6 Marketing Audit Implementation (v1.0.1 Phase 1)
+
+| Element | Before | After |
+|---------|--------|-------|
+| Background | Orange gradient | Near-black (#0d0d0d) |
+| Headings | Inter font | Bebas Neue (bold, uppercase) |
+| Tagline | Small serif | Large, yellow "Faces" accent |
+| CTA Button | Image | Yellow styled button with orange hover |
+| Social Proof | None | "10,000+ bad friends already signed up" |
+| Feature Cards | #111827 | #1a1a1a with orange top border, yellow titles |
+| How It Works | Basic cards | Giant background numbers, dashed connector line |
+| Safety Section | Bullet list | 2x2 grid with icons and orange borders |
+| Footer | Low contrast | Proper visibility with hover states |
+
+---
+
+## 2. SUPABASE DNS ISSUE (Identified)
+
+### Problem Description
+
+| Test | Result |
+|------|--------|
+| `nslookup valyrdrdwceszcuuytprn.supabase.co` | NXDOMAIN |
+| Dashboard status | Shows "Healthy" |
+| Auth endpoint | ✅ Working |
+| Storage endpoint | ✅ Working |
+| Database connection | ❌ Failing |
+
+### Known Issue References
+
+- GitHub #38521: "Direct DB hostname does not resolve — NXDOMAIN"
+- GitHub #35131: "Attempts to access project via the API fail with DNS error"
+- GitHub #36900: "DNS resolution error - nslookup returns No answer"
+
+### Decision Made
+
+**Migrate from Supabase to Neon PostgreSQL in v1.1**
+
+| Reason | Explanation |
+|--------|-------------|
+| DNS reliability | Neon has no known DNS issues |
+| Free tier | 0.5 GB storage, 190 compute hours/month |
+| PostgreSQL compatible | Existing schema works unchanged |
+| No credit card | Free tier available |
+
+---
+
+## 3. NEW CSS CLASSES (All Screens)
+
+```css
+/* Primary CTA - Yellow/Orange Gradient */
+.btn-primary {
+    background: linear-gradient(135deg, #f5820a 0%, #f5c518 100%);
+    color: #1a1000;
+    padding: 14px 24px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 15px rgba(245, 130, 10, 0.4);
+}
+
+/* Secondary - Orange Outline */
+.btn-secondary {
+    background: transparent;
+    border: 2px solid #f5820a;
+    color: #f5820a;
+    padding: 12px 20px;
+    border-radius: 9999px;
+}
+
+/* Tab Buttons */
+.btn-tab {
+    background: #1a1f2e;
+    color: #9ca3af;
+    padding: 10px 20px;
+    border-radius: 40px;
+    text-transform: uppercase;
+}
+.btn-tab.active {
+    background: linear-gradient(135deg, #f5820a, #f5c518);
+    color: #1a1000;
+}
+
+/* Reaction Buttons */
+.btn-reaction {
+    background: #1a1f2e;
+    border: 1px solid #2d3a5f;
+    padding: 8px 16px;
+    border-radius: 9999px;
+}
+.btn-reaction-bobo:hover { background: rgba(245, 155, 11, 0.2); border-color: #f59e0b; }
+.btn-reaction-cheeto:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+.btn-reaction-tiger:hover { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+.btn-reaction-dead:hover { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; }
+
+/* Like Button */
+.btn-like {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* Navigation Items */
+.nav-item {
+    transition: all 0.2s ease;
+}
+.nav-item.active {
+    color: #f5820a;
+    transform: translateY(-4px);
+    text-shadow: 0 0 8px rgba(245, 130, 10, 0.5);
+}
+4. FILES CREATED IN THIS SESSION
+Backend
+text
+backend/services/friendship_service.py     ✅ NEW
+backend/Dockerfile                         ✅ NEW
+Frontend - Screens
+text
+frontend/src/screens/MatchesScreen.jsx     ✅ NEW
+frontend/src/screens/ProfileScreen.jsx     ✅ NEW
+frontend/src/screens/DiscoverScreen.jsx    ✅ NEW
+frontend/src/screens/SisterhoodScreen.jsx  ✅ NEW
+frontend/src/screens/LandingScreen.jsx     ✅ REDESIGNED
+Frontend - Components
+text
+frontend/src/components/BottomNav.jsx      ✅ NEW
+frontend/src/components/Banner.jsx         ✅ NEW
+frontend/src/components/MorningFaceThumbnail.jsx ✅ NEW
+Frontend - Utils
+text
+frontend/src/utils/mockData.js             ✅ NEW (expanded)
+5. FILES MODIFIED IN THIS SESSION
+File	Changes
+backend/main.py	Added friendship endpoints, CORS fix
+frontend/src/App.jsx	Added routes, localStorage onboarding check
+frontend/src/screens/HomeScreen.jsx	Updated tabs, reactions, mock data
+frontend/src/screens/OnboardingScreen.jsx	Added localStorage flag
+frontend/src/components/BottomNav.jsx	Updated to nav-item class
+frontend/src/index.css	Added button classes, gradient background
+frontend/tailwind.config.js	Updated for v3, brand colors
+frontend/.env	Fixed duplicate VITE_API_URL
+6. NEW ENDPOINTS AVAILABLE
+Endpoint	Method	Purpose
+/friends/follow/{user_id}	POST	Follow a user
+/friends/follow/{user_id}	DELETE	Unfollow a user
+/friends/followers	GET	Get my followers
+/friends/following	GET	Get users I follow
+/bad-friends/list	GET	Get accepted Bad Friends
+/bad-friends/pending	GET	Get pending requests
+/bad-friends/accept/{user_id}	POST	Accept Bad Friend
+/worst-friends/list	GET	Get romantic matches
+/matches/pending	GET	Get pending likes
+/friends/summary	GET	Get all layer counts
+7. DEPLOYMENT STATUS
+Service	URL	Status
+Frontend (Netlify)	https://bad-friends-morning-face.netlify.app	✅ LIVE
+Backend (Render)	https://bad-friends-morning-face-build.onrender.com	✅ LIVE
+v1.0.0 Tag	v1.0.0	✅ Created
+v1.0.1 Branch	v1.0.1	✅ Created
+8. KNOWN ISSUES (End of Session)
+Issue	Status	Fix Version
+Supabase DNS (NXDOMAIN)	❌ Unresolved	v1.1 (Neon migration)
+Button image transparency on HomeScreen tabs	🟡 Needs image editing	v1.0.1
+CTA button size on LandingScreen	🟡 Needs adjustment	v1.0.1
+Onboarding redirect	✅ RESOLVED	v1.0.0
+Netlify SPA routing	✅ RESOLVED	v1.0.0
+9. WHAT'S LEFT FOR v1.0.1
+Phase	Component	Status
+2	index.css - Dark theme	⏳ Next
+3	HomeScreen.jsx updates	⏳ Pending
+4	OnboardingScreen.jsx styling	⏳ Pending
+5	Demo Mode (disable auth)	⏳ Pending
+6	Mock Data Expansion (30+ entries)	⏳ Pending
+7	Button Size Improvements	⏳ Pending
+8	Testing & Deployment	⏳ Pending
+10. WHAT'S LEFT FOR v1.1
+Feature	Description
+Neon Database Migration	Replace Supabase PostgreSQL
+Feed Component	Real friends' morning faces and answers
+Real Matching Logic	Replace mock data in Discover
+AI Question Generation	Groq API integration
+Sisterhood Backend	Complete implementation
+11. COMMANDS FROM THIS SESSION
+bash
+# Branch for v1.0.1
+git checkout -b v1.0.1
+git push origin v1.0.1
+
+# Tag v1.0.0
+git tag v1.0.0
+git push origin v1.0.0
+
+# Start backend
+cd backend && python3 -m uvicorn main:app --reload --port 8000
+
+# Start frontend
+cd frontend && npm run dev
+END OF UPDATE
+
 ---
 ## UPDATE: April 8, 2026 - 11:14 PM (Post-Phase 6.4 through 6.9)
 

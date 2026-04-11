@@ -23,6 +23,26 @@ const OnboardingScreen = () => {
     return data.session?.access_token;
   };
   
+  // Save progress to localStorage so user can resume
+  const saveProgress = (stepNum, data) => {
+    localStorage.setItem('bf_onboarding_step', stepNum);
+    localStorage.setItem('bf_onboarding_data', JSON.stringify(data || {}));
+  };
+  
+  const clearProgress = () => {
+    localStorage.removeItem('bf_onboarding_step');
+    localStorage.removeItem('bf_onboarding_data');
+  };
+  
+  const handleSaveAndExit = () => {
+    // Save current progress before exiting
+    if (step === 1 && psychologicalData) saveProgress(step, psychologicalData);
+    if (step === 2 && cmiData) saveProgress(step, cmiData);
+    if (step === 3 && calibrationData) saveProgress(step, calibrationData);
+    if (step === 4 && dealbreakersData) saveProgress(step, dealbreakersData);
+    navigate('/');
+  };
+  
   const savePsychologicalData = async (data) => {
     setLoading(true);
     try {
@@ -36,6 +56,7 @@ const OnboardingScreen = () => {
         body: JSON.stringify(data)
       });
       setPsychologicalData(data);
+      saveProgress(2, data);
       setStep(2);
       setProgress(0);
     } catch (error) {
@@ -49,6 +70,7 @@ const OnboardingScreen = () => {
     setLoading(true);
     try {
       setCmiData(answers);
+      saveProgress(3, answers);
       setStep(3);
       setProgress(0);
     } catch (error) {
@@ -71,6 +93,7 @@ const OnboardingScreen = () => {
         body: JSON.stringify(data)
       });
       setCalibrationData(data);
+      saveProgress(4, data);
       setStep(4);
       setProgress(0);
     } catch (error) {
@@ -96,7 +119,9 @@ const OnboardingScreen = () => {
       if (response.ok) {
         setDealbreakersData(data);
         localStorage.setItem('bf_onboarding_complete', 'true');
-        window.location.href = '/app';
+        clearProgress(); // Clear saved progress
+        // Use React Router navigation instead of hard reload
+        navigate('/app');
       }
     } catch (error) {
       console.error('Error saving dealbreakers:', error);
@@ -105,29 +130,29 @@ const OnboardingScreen = () => {
     }
   };
   
-  // UPDATED FEATURES LIST - More detailed
+  // UPDATED FEATURES LIST - With bold name + muted description
   const featuresList = [
-    { icon: "🌅", text: "Daily Morning Face Streak - Earn trust points" },
-    { icon: "🎭", text: "Answers-First Discovery - Personality before photos" },
-    { icon: "👥", text: "Four Friendship Layers - Friends → Bad → Worst → Matches" },
-    { icon: "💀", text: "Worst Friend Reactions - Community gold standard" },
-    { icon: "👭", text: "The Sisterhood - Women-only safety network" },
-    { icon: "📈", text: "Graduated Trust Levels - Earn features through behavior" },
+    { icon: "🌅", name: "Daily Morning Face", desc: "Earn trust points with daily streaks" },
+    { icon: "🎭", name: "Answers-First Discovery", desc: "Personality before photos" },
+    { icon: "👥", name: "Four Friendship Layers", desc: "Friends → Bad → Worst → Matches" },
+    { icon: "💀", name: "Worst Friend Reactions", desc: "Community gold standard for humor" },
+    { icon: "👭", name: "The Sisterhood", desc: "Women-only safety network" },
+    { icon: "📈", name: "Graduated Trust Levels", desc: "Earn features through behavior" },
   ];
   
-  // UPDATED SAFETY LIST - Architecture focused
+  // UPDATED SAFETY LIST - As mini-cards with checkmarks
   const safetyList = [
-    { icon: "🛡️", text: "Women-First Safety Design" },
-    { icon: "🔒", text: "End-to-End Encryption for Messages" },
-    { icon: "📞", text: "Bad Friend Backup - Share date with trusted contact" },
-    { icon: "🚨", text: "Emergency Kill Switch - One-tap lockdown" },
-    { icon: "🚫", text: "No Screenshots in Sisterhood" },
-    { icon: "📍", text: "Graduated Location Sharing - Level 4+ only" },
+    { icon: "🛡️", text: "Women-First Safety Design", verified: true },
+    { icon: "🔒", text: "End-to-End Encryption for Messages", verified: true },
+    { icon: "📞", text: "Bad Friend Backup - Share date with trusted contact", verified: true },
+    { icon: "🚨", text: "Emergency Kill Switch - One-tap lockdown", verified: true },
+    { icon: "🚫", text: "No Screenshots in Sisterhood", verified: true },
+    { icon: "📍", text: "Graduated Location Sharing - Level 4+ only", verified: true },
   ];
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center">
         <div className="text-center">
           <div className="bf-spinner"></div>
           <p className="text-gray-400 mt-4">Saving your secrets...</p>
@@ -137,35 +162,42 @@ const OnboardingScreen = () => {
   }
   
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-6xl mx-auto">
-        
-        {/* BFMF Logo */}
-        <div className="flex justify-center mb-6">
-          <img src="/BFMF_Banner..png" alt="BF Morning Face" className="w-48" />
-        </div>
-        
-        {/* Three-Column Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          
-          {/* Left Column - Features (UPDATED TITLE) */}
-          <div className="bf-card h-fit rounded-2xl">
-            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
-              <span>⚡</span> BF Morning Face Features
-            </h3>
-            <div className="space-y-2">
-              {featuresList.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-                  <span className="text-base">{feature.icon}</span>
-                  <span>{feature.text}</span>
-                </div>
-              ))}
+    <div className="min-h-screen bg-[#0d0d0d]">
+      {/* Nav Bar - Logo left, Save & Exit right */}
+      <div className="nav-bar max-w-6xl mx-auto px-4 py-4">
+        <img src="/BFMF_Banner..png" alt="BF Morning Face" className="h-10 w-auto" />
+        <button onClick={handleSaveAndExit} className="save-exit-btn">
+          Save & Exit →
+        </button>
+      </div>
+      
+      <div className="px-4 pb-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Three-Column Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            {/* Left Column - Features (UPDATED with bold name + muted description) */}
+            <div className="bf-card rounded-2xl">
+              <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-lg">
+                <span>⚡</span> BF Morning Face Features
+              </h3>
+              <div className="space-y-3">
+                {featuresList.map((feature, idx) => (
+                  <div key={idx} className="feature-item">
+                    <div className="flex items-start gap-2">
+                      <span className="text-base">{feature.icon}</span>
+                      <div>
+                        <div className="feature-name">{feature.name}</div>
+                        <div className="feature-desc">{feature.desc}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          
-          {/* Center Column - Questions (ADDED ROUNDED CORNERS) */}
-          <div className="md:col-span-2 rounded-2xl">
-            <div className="rounded-2xl">
+            
+            {/* Center Column - Questions */}
+            <div className="md:col-span-2">
               {step === 1 && (
                 <PsychologicalScales 
                   onComplete={savePsychologicalData}
@@ -192,28 +224,32 @@ const OnboardingScreen = () => {
                 />
               )}
             </div>
-          </div>
-          
-          {/* Right Column - Trusted Architecture (UPDATED TITLE) */}
-          <div className="bf-card h-fit rounded-2xl">
-            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
-              <span>🛡️</span> Trusted Architecture
-            </h3>
-            <div className="space-y-2">
-              {safetyList.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-                  <span className="text-base">{item.icon}</span>
-                  <span>{item.text}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-3 border-t border-bf-border">
-              <div className="bg-[#1a1f2e] text-white border border-orange-500 px-2 py-1 rounded-full text-xs text-center font-semibold inline-block w-full">
-                Women-First Safety
+            
+            {/* Right Column - Trusted Architecture (UPDATED with mini-cards) */}
+            <div className="bf-card rounded-2xl">
+              <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-lg">
+                <span>🛡️</span> Trusted Architecture
+              </h3>
+              <div className="space-y-2">
+                {safetyList.map((item, idx) => (
+                  <div key={idx} className="safety-card flex items-center">
+                    <span className="safety-icon">{item.icon}</span>
+                    <span className="safety-text flex-1">{item.text}</span>
+                    {item.verified && <span className="safety-check">✓</span>}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-3 border-t border-gray-800">
+                <button 
+                  onClick={() => document.getElementById('safety-cta')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="btn-cta-solid w-full text-center"
+                >
+                  Women-First Safety
+                </button>
               </div>
             </div>
+            
           </div>
-          
         </div>
       </div>
     </div>
