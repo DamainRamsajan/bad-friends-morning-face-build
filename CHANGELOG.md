@@ -8,4 +8,5 @@
 ## [2026-04-10 17:28] [26d4b06] feat(v1.0.1): Replace text buttons with custom images
 ## [2026-04-10 19:25] [af3f99d] fix(onboarding): Add rounded corners to all onboarding component containers
 ## [2026-04-10 19:57] [72dad04] style(landing): Double CTA button size to h-64
-## [2026-04-11 10:40] [f0bed11] fix: stop tracking __pycache__ files
+## [2026-04-11 08:39] [fb5bfe7] fix: clear textarea on question change in BaselineCMI
+## [2026-04-11 09:16] [7c8d552] feat: add /users/count endpoint for mock data threshold

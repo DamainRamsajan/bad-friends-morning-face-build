@@ -1,7 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LandingScreen = () => {
+  const navigate = useNavigate();
+  
+  // Demo mode handler - goes through onboarding first
+  const startDemo = () => {
+    // Set demo mode flags
+    localStorage.setItem('bf_demo_mode', 'true');
+    localStorage.setItem('bf_demo_user', JSON.stringify({
+      id: 'demo-user-001',
+      name: 'Demo Dan',
+      email: 'demo@badfriends.app',
+      streak_days: 7,
+      trust_level: 3,
+      cmi_score: 87,
+      gender: 'man'
+    }));
+    
+    // Navigate to onboarding first
+    navigate('/onboarding');
+  };
+  
   return (
     <div className="min-h-screen bg-[#0d0d0d]">
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -25,12 +45,52 @@ const LandingScreen = () => {
             No filters. No retakes. Just you and your worst friend energy.
           </p>
           
-          {/* CTA Button - Yellow with orange hover */}
-          <Link to="/register">
-            <button className="bg-[#f5c518] hover:bg-[#f5820a] text-black font-bold text-xl py-4 px-12 rounded-full transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-orange-500/30">
-              🍜 TRY BF MORNING FACE
+          {/* CTA Buttons - Demo Mode Active, Auth Buttons Greyed Out */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            {/* DEMO BUTTON - Primary CTA (Yellow, fully active) */}
+            <button 
+              onClick={startDemo}
+              className="bg-[#f5c518] hover:bg-[#f5820a] text-black font-bold text-xl py-4 px-12 rounded-full transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-orange-500/30"
+            >
+              🍜 TRY DEMO MODE
             </button>
-          </Link>
+            
+            {/* REGISTER BUTTON - Greyed out (disabled for v1.0.1) */}
+            <div className="relative group">
+              <Link to="/register">
+                <button 
+                  disabled
+                  className="bg-gray-600 text-gray-400 font-bold text-xl py-4 px-8 rounded-full cursor-not-allowed opacity-60"
+                >
+                  Register (v1.1)
+                </button>
+              </Link>
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                Coming in v1.1
+              </span>
+            </div>
+            
+            {/* LOGIN BUTTON - Greyed out (disabled for v1.0.1) */}
+            <div className="relative group">
+              <Link to="/login">
+                <button 
+                  disabled
+                  className="bg-gray-600 text-gray-400 font-bold text-xl py-4 px-8 rounded-full cursor-not-allowed opacity-60"
+                >
+                  Login (v1.1)
+                </button>
+              </Link>
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                Coming in v1.1
+              </span>
+            </div>
+          </div>
+          
+          {/* Demo Mode Notice */}
+          <div className="mt-4 inline-block px-4 py-2 bg-[#f5820a]/20 border border-[#f5820a] rounded-full">
+            <span className="text-[#f5c518] text-sm font-semibold">🎮 DEMO MODE AVAILABLE</span>
+            <span className="text-gray-400 text-xs ml-2">No registration required</span>
+          </div>
           
           {/* Social Proof Micro-copy */}
           <p className="text-gray-500 text-sm mt-4">
@@ -152,6 +212,9 @@ const LandingScreen = () => {
             <a href="#" className="hover:text-[#f5820a] transition">Privacy</a>
             <a href="#" className="hover:text-[#f5820a] transition">Terms</a>
           </div>
+          <p className="text-gray-600 text-xs mt-4">
+            v1.0.1 Demo Mode • Full authentication coming in v1.1
+          </p>
         </div>
         
       </div>

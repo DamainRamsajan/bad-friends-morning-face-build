@@ -1,5 +1,5 @@
 // frontend/src/components/onboarding/BaselineCMI.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';  // CHANGED: added useRef
 
 const BaselineCMI = ({ onComplete, onProgress, apiUrl, getToken }) => {
   const [questions, setQuestions] = useState([]);
@@ -8,10 +8,19 @@ const BaselineCMI = ({ onComplete, onProgress, apiUrl, getToken }) => {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const textareaRef = useRef(null);  // NEW: ref for textarea
 
   useEffect(() => {
     fetchBaselineQuestions();
   }, []);
+
+  // NEW: Clear textarea when question changes
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.value = '';
+      textareaRef.current.focus();
+    }
+  }, [currentIndex]);
 
   const fetchBaselineQuestions = async () => {
     setLoading(true);
@@ -150,6 +159,7 @@ const BaselineCMI = ({ onComplete, onProgress, apiUrl, getToken }) => {
           </p>
           
           <textarea
+            ref={textareaRef}  // CHANGED: added ref
             placeholder="Write your funniest answer here... (min 10 characters)"
             className="w-full bg-[#0d0d0d] border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#f5820a] transition"
             rows="3"
