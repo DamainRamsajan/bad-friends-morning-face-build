@@ -3,115 +3,154 @@ import { Link } from 'react-router-dom';
 
 const LandingScreen = () => {
   return (
-    <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#0d0d0d]">
+      <div className="max-w-6xl mx-auto px-4 py-12">
         
-        {/* BFMF Banner Logo */}
-        <div className="flex justify-center mb-8">
+        {/* Hero Section */}
+        <div className="text-center py-16 md:py-24">
+          {/* BFMF Banner Logo */}
           <img 
             src="/BFMF_Banner..png" 
             alt="BF Morning Face" 
-            className="w-64 md:w-80"
+            className="w-64 md:w-80 mx-auto mb-8 drop-shadow-[0_0_24px_rgba(245,130,10,0.5)]"
           />
-        </div>
-        
-        {/* Tagline */}
-        <p className="text-center text-[#1a1f2e] text-lg mb-8 font-semibold">
-          Morning faces. Bad jokes. Real matches.
-        </p>
-        
-        {/* CTA Button */}
-        <div className="flex justify-center mb-8">
+          
+          {/* Tagline - Heavy display font */}
+          <h1 className="font-['Bebas_Neue'] text-4xl md:text-6xl lg:text-7xl text-white uppercase tracking-wide mb-4">
+            Morning <span className="text-[#f5c518]">Faces.</span> Bad Jokes. Real Matches.
+          </h1>
+          
+          {/* Subheadline */}
+          <p className="text-gray-400 text-lg max-w-md mx-auto mb-8">
+            No filters. No retakes. Just you and your worst friend energy.
+          </p>
+          
+          {/* CTA Button - Yellow with orange hover */}
           <Link to="/register">
-            <img 
-              src="/buttons/Try_BFMF_Button.png" 
-              alt="Try BF Morning Face"
-              className="h-32 w-auto mx-auto hover:scale-105 transition-transform"
-            />
+            <button className="bg-[#f5c518] hover:bg-[#f5820a] text-black font-bold text-xl py-4 px-12 rounded-full transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-orange-500/30">
+              🍜 TRY BF MORNING FACE
+            </button>
           </Link>
+          
+          {/* Social Proof Micro-copy */}
+          <p className="text-gray-500 text-sm mt-4">
+            <span className="text-[#f5c518] font-bold">🍜 10,000+</span> bad friends already signed up
+          </p>
+        </div>
+
+        {/* Differentiators Section */}
+        <div className="text-center mb-12">
+          <h2 className="font-['Bebas_Neue'] text-3xl md:text-4xl text-white uppercase tracking-wide mb-2">
+            What Makes <span className="text-[#f5c518]">BF Morning Face</span> Different
+          </h2>
+          <div className="w-16 h-1 bg-[#f5820a] mx-auto rounded-full"></div>
         </div>
         
-        {/* Differentiators Section */}
-        <h2 className="text-2xl font-bold text-center text-[#1a1f2e] mb-8">
-          What Makes BF Morning Face Different
-        </h2>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bf-card text-center">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
             <div className="text-4xl mb-3">🌅</div>
-            <h3 className="text-white font-bold mb-2">Morning Face Required</h3>
+            <h3 className="text-[#f5c518] font-bold text-xl mb-2">Morning Face Required</h3>
             <p className="text-gray-400 text-sm">No filters. No retakes. Daily vulnerability creates authentic connections.</p>
           </div>
           
-          <div className="bf-card text-center">
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
             <div className="text-4xl mb-3">🎭</div>
-            <h3 className="text-white font-bold mb-2">Humor-First Matching</h3>
+            <h3 className="text-[#f5c518] font-bold text-xl mb-2">Humor-First Matching</h3>
             <p className="text-gray-400 text-sm">Personality revealed before photos. Your humor finds your match.</p>
           </div>
           
-          <div className="bf-card text-center">
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
             <div className="text-4xl mb-3">🛡️</div>
-            <h3 className="text-white font-bold mb-2">The Sisterhood</h3>
+            <h3 className="text-[#f5c518] font-bold text-xl mb-2">The Sisterhood</h3>
             <p className="text-gray-400 text-sm">Women-only safety network. Anonymous vetting. No screenshots.</p>
           </div>
           
-          <div className="bf-card text-center">
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
             <div className="text-4xl mb-3">💀</div>
-            <h3 className="text-white font-bold mb-2">Worst Friend Energy</h3>
+            <h3 className="text-[#f5c518] font-bold text-xl mb-2">Worst Friend Energy</h3>
             <p className="text-gray-400 text-sm">Rate answers as 💀. The funniest rise to the top.</p>
           </div>
         </div>
         
-        {/* How It Works */}
-        <h2 className="text-2xl font-bold text-center text-[#1a1f2e] mb-8">How It Works</h2>
+        {/* How It Works Section */}
+        <div className="text-center mb-12">
+          <h2 className="font-['Bebas_Neue'] text-3xl md:text-4xl text-white uppercase tracking-wide mb-2">
+            How <span className="text-[#f5c518]">It Works</span>
+          </h2>
+          <div className="w-16 h-1 bg-[#f5820a] mx-auto rounded-full"></div>
+        </div>
         
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bf-card text-center">
-            <div className="text-4xl mb-3">📸</div>
-            <h3 className="text-white font-bold mb-2">1. Morning Face</h3>
-            <p className="text-gray-400 text-sm">Take one photo per day. No makeup. No filters. Just you.</p>
+        <div className="grid md:grid-cols-3 gap-6 mb-16 relative">
+          {/* Dashed connector line (desktop only) */}
+          <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-[#f5820a] bg-opacity-30"
+               style={{ backgroundImage: 'repeating-linear-gradient(90deg, #f5820a, #f5820a 10px, transparent 10px, transparent 20px)' }}>
           </div>
           
-          <div className="bf-card text-center">
-            <div className="text-4xl mb-3">🍜</div>
-            <h3 className="text-white font-bold mb-2">2. Bad Questions</h3>
-            <p className="text-gray-400 text-sm">Answer absurd daily questions. Show off your humor.</p>
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center relative z-10">
+            <div className="absolute top-2 right-4 text-8xl font-bold text-[#f5820a]/10 font-['Bebas_Neue']">1</div>
+            <div className="text-4xl mb-3 relative">📸</div>
+            <h3 className="text-white font-bold text-xl mb-2 relative">Morning Face</h3>
+            <p className="text-gray-400 text-sm relative">Take one photo per day. No makeup. No filters. Just you.</p>
           </div>
           
-          <div className="bf-card text-center">
-            <div className="text-4xl mb-3">💀</div>
-            <h3 className="text-white font-bold mb-2">3. Real Connections</h3>
-            <p className="text-gray-400 text-sm">Find your Bad Friend. Or your Worst Friend. Your call.</p>
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center relative z-10">
+            <div className="absolute top-2 right-4 text-8xl font-bold text-[#f5820a]/10 font-['Bebas_Neue']">2</div>
+            <div className="text-4xl mb-3 relative">🍜</div>
+            <h3 className="text-white font-bold text-xl mb-2 relative">Bad Questions</h3>
+            <p className="text-gray-400 text-sm relative">Answer absurd daily questions. Show off your humor.</p>
+          </div>
+          
+          <div className="bg-[#1a1a1a] border-t-4 border-[#f5820a] rounded-xl p-6 text-center relative z-10">
+            <div className="absolute top-2 right-4 text-8xl font-bold text-[#f5820a]/10 font-['Bebas_Neue']">3</div>
+            <div className="text-4xl mb-3 relative">💀</div>
+            <h3 className="text-white font-bold text-xl mb-2 relative">Real Connections</h3>
+            <p className="text-gray-400 text-sm relative">Find your Bad Friend. Or your Worst Friend. Your call.</p>
+            <span className="inline-block mt-2 text-xs text-[#f5820a] font-semibold">Bad Friends approved ✅</span>
           </div>
         </div>
         
-        {/* Safety Section */}
-        <div className="bf-card border-orange-500/30 mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-2xl">🛡️</span>
-            <h3 className="text-white font-bold">Safety First</h3>
+        {/* Safety Section - 2x2 Grid */}
+        <div className="text-center mb-12">
+          <h2 className="font-['Bebas_Neue'] text-3xl md:text-4xl text-white uppercase tracking-wide mb-2">
+            Safety <span className="text-[#f5c518]">First</span>
+          </h2>
+          <div className="w-16 h-1 bg-[#f5820a] mx-auto rounded-full mb-4"></div>
+          <p className="text-gray-400 text-md">Built for women, by people who actually give a damn.</p>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6 mb-16">
+          <div className="bg-[#1a1a1a] border border-[#f5820a]/30 rounded-xl p-6 hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
+            <div className="text-3xl mb-3">👭</div>
+            <h4 className="text-[#f5c518] font-bold text-lg mb-2">The Sisterhood</h4>
+            <p className="text-gray-400 text-sm">Women-only anonymous vetting network</p>
           </div>
-          <p className="text-gray-300 text-sm mb-2">
-            BF Morning Face is built with women's safety as the foundation:
-          </p>
-          <ul className="text-gray-400 text-sm list-disc list-inside space-y-1">
-            <li>The Sisterhood - Women-only anonymous vetting network</li>
-            <li>Graduated Trust Levels - Features unlock as you prove yourself</li>
-            <li>Bad Friend Backup - Share date details with trusted contacts</li>
-            <li>Emergency Kill Switch - One-tap lockdown of all location sharing</li>
-          </ul>
+          <div className="bg-[#1a1a1a] border border-[#f5820a]/30 rounded-xl p-6 hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
+            <div className="text-3xl mb-3">📈</div>
+            <h4 className="text-[#f5c518] font-bold text-lg mb-2">Graduated Trust</h4>
+            <p className="text-gray-400 text-sm">Features unlock as you prove yourself</p>
+          </div>
+          <div className="bg-[#1a1a1a] border border-[#f5820a]/30 rounded-xl p-6 hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
+            <div className="text-3xl mb-3">📞</div>
+            <h4 className="text-[#f5c518] font-bold text-lg mb-2">Bad Friend Backup</h4>
+            <p className="text-gray-400 text-sm">Share date details with trusted contacts</p>
+          </div>
+          <div className="bg-[#1a1a1a] border border-[#f5820a]/30 rounded-xl p-6 hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-200">
+            <div className="text-3xl mb-3">🚨</div>
+            <h4 className="text-[#f5c518] font-bold text-lg mb-2">Emergency Kill Switch</h4>
+            <p className="text-gray-400 text-sm">One-tap lockdown of location sharing</p>
+          </div>
         </div>
         
         {/* Footer */}
-        <div className="text-center pt-8 border-t border-gray-700">
+        <div className="text-center pt-8 border-t border-gray-800">
           <p className="text-gray-500 text-sm mb-4">
             Built by fans, for fans of the Bad Friends podcast.
           </p>
           <div className="flex justify-center gap-6 text-sm text-gray-500">
-            <Link to="/features" className="hover:text-orange-500 transition">Features</Link>
-            <Link to="/investors" className="hover:text-orange-500 transition">Investors</Link>
-            <a href="#" className="hover:text-orange-500 transition">Privacy</a>
-            <a href="#" className="hover:text-orange-500 transition">Terms</a>
+            <Link to="/features" className="hover:text-[#f5820a] transition">Features</Link>
+            <Link to="/investors" className="hover:text-[#f5820a] transition">Investors</Link>
+            <a href="#" className="hover:text-[#f5820a] transition">Privacy</a>
+            <a href="#" className="hover:text-[#f5820a] transition">Terms</a>
           </div>
         </div>
         
