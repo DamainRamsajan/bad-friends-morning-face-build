@@ -25,19 +25,11 @@ const LandingScreen = () => {
             No filters. No retakes. Just you and your worst friend energy.
           </p>
           
-          {/* CTA Buttons - Both Active (Full Production) */}
+          {/* SINGLE CTA BUTTON - Try BF Morning Face */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-            {/* REGISTER BUTTON - Active */}
             <Link to="/register">
               <button className="bg-[#f5c518] hover:bg-[#f5820a] text-black font-bold text-xl py-4 px-12 rounded-full transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-orange-500/30">
-                🍜 Register
-              </button>
-            </Link>
-            
-            {/* LOGIN BUTTON - Active */}
-            <Link to="/login">
-              <button className="bg-transparent border-2 border-[#f5c518] hover:bg-[#f5c518]/10 text-[#f5c518] font-bold text-xl py-4 px-12 rounded-full transition-all duration-200 hover:scale-105">
-                Login
+                🍜 TRY BF MORNING FACE
               </button>
             </Link>
           </div>
@@ -91,7 +83,6 @@ const LandingScreen = () => {
         </div>
         
         <div className="grid md:grid-cols-3 gap-6 mb-16 relative">
-          {/* Dashed connector line (desktop only) */}
           <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-[#f5820a] bg-opacity-30"
                style={{ backgroundImage: 'repeating-linear-gradient(90deg, #f5820a, #f5820a 10px, transparent 10px, transparent 20px)' }}>
           </div>
